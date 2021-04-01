@@ -2,19 +2,19 @@
 //////////////////////////////////////////////////////////////////////
 // definition of color types
 
-interface ColorHLC {
+export interface ColorHLC {
   H: number;
   L: number;
   C: number;
 }
 
-interface ColorLAB {
+export interface ColorLAB {
   L: number;
   a: number;
   b: number;
 }
 
-interface ColorXYZ {
+export interface ColorXYZ {
   x: number;
   y: number;
   z: number;
@@ -24,17 +24,17 @@ interface ColorXYZ {
 // conversion between color types; see www.brucelindbloom.com and
 // en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model
 
-function HLC_to_LAB(color: ColorHLC): ColorLAB {
+export function HLC_to_LAB(color: ColorHLC): ColorLAB {
   return {
     L: color.L,
-    a: color.C * Math.cos(color.H),
-    b: color.C * Math.sin(color.H)
+    a: color.C * Math.cos(rad(color.H)),
+    b: color.C * Math.sin(rad(color.H))
   };
 }
 
-function LAB_to_HLC(color: ColorLAB): ColorHLC {
+export function LAB_to_HLC(color: ColorLAB): ColorHLC {
   return {
-    H: Math.atan2(color.a, color.b),
+    H: deg(Math.atan2(color.a, color.b)),
     L: color.L,
     C: Math.sqrt(color.a ** 2 + color.b ** 2)
   };
@@ -43,7 +43,7 @@ function LAB_to_HLC(color: ColorLAB): ColorHLC {
 const eps: number = 216 / 24389;
 const kappa: number = 24389 / 27;
 
-function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
+export function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
   const { L, a, b } = color;
 
   const fy: number = (L + 16) / 116;
@@ -57,7 +57,7 @@ function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
   return { x: x, y: y, z: z };
 }
 
-function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
+export function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
   const {x, y, z } = color;
 
   const fx: number = x > eps ? x ** (1 / 3) : (kappa * x + 16) / 116;
@@ -71,13 +71,21 @@ function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
   };
 }
 
+export function XYZ_to_HLC(color: ColorXYZ): ColorHLC {
+  return LAB_to_HLC(XYZ_to_LAB(color));
+}
+
+export function HLC_to_XYZ(color: ColorHLC): ColorXYZ {
+  return LAB_to_XYZ(HLC_to_LAB(color));
+}
+
 //////////////////////////////////////////////////////////////////////
 // difference according to CIEDE2000; see
 // http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
 //
 // Numbers are according to the equation labels in that document.
 
-function CIEDE2000(color1: ColorLAB, color2: ColorLAB): number {
+export function CIEDE2000(color1: ColorLAB, color2: ColorLAB): number {
   let { L: L1, a: a1, b: b1 } = color1;
   let { L: L2, a: a2, b: b2 } = color2;
 
@@ -185,5 +193,3 @@ function deg(rad: number): number {
 function rad(deg: number): number {
   return deg * Math.PI / 180;
 }
-
-export default CIEDE2000;

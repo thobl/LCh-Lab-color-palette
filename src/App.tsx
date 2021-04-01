@@ -1,6 +1,6 @@
 import React from 'react';
-import Circle from './Circle';
-import CIEDE2000 from './Color';
+import { CIEDE2000 } from './Color';
+import Palette from './Palette'
 
 class App extends React.Component {
   render(): JSX.Element {
@@ -43,9 +43,9 @@ class App extends React.Component {
     return (
       <div>
         <div className="Canvas" style={{ border: '1px solid', width: '800px', height: '800px' }}>
-          <Circle x={200} y={200} r={30} color="#ff0000" />
+          <Palette base={{ x: 0.9, y: 0.9, z: 0.9 }} color1={{ x: 0.9, y: 0.1, z: 0.1 }} n={5} />
         </div>
-        </div>
+      </div>
     )
   }
 }
