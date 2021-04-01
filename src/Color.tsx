@@ -79,6 +79,18 @@ export function HLC_to_XYZ(color: ColorHLC): ColorXYZ {
   return LAB_to_XYZ(HLC_to_LAB(color));
 }
 
+export function XYZ_to_CSS(color: ColorXYZ): string {
+  return "rgb(" + 255 * color.x + "," + 255 * color.y + "," + 255 * color.z + ")";
+}
+
+export function LAB_to_CSS(color: ColorLAB): string {
+  return XYZ_to_CSS(LAB_to_XYZ(color));
+}
+
+export function HLC_to_CSS(color: ColorHLC): string {
+  return XYZ_to_CSS(HLC_to_XYZ(color));
+}
+
 //////////////////////////////////////////////////////////////////////
 // difference according to CIEDE2000; see
 // http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
