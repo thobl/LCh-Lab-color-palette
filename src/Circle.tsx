@@ -16,7 +16,7 @@ class Circle extends React.Component<CircleProps> {
         top: this.props.y,
         width: this.props.r,
         height: this.props.r,
-        position: 'relative',
+        position: 'absolute',
         borderRadius: '50%',
         border: '1px solid'
       }}>

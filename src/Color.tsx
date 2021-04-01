@@ -28,13 +28,13 @@ export function HLC_to_LAB(color: ColorHLC): ColorLAB {
   return {
     L: color.L,
     a: color.C * Math.cos(rad(color.H)),
-    b: color.C * Math.sin(rad(color.H))
+    b: color.C * Math.sin(rad(color.H)),
   };
 }
 
 export function LAB_to_HLC(color: ColorLAB): ColorHLC {
   return {
-    H: deg(Math.atan2(color.a, color.b)),
+    H: deg(Math.atan2(color.b, color.a)),
     L: color.L,
     C: Math.sqrt(color.a ** 2 + color.b ** 2)
   };
@@ -48,7 +48,7 @@ export function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
 
   const fy: number = (L + 16) / 116;
   const fx: number = a / 500 + fy;
-  const fz: number = fy - b / 2000;
+  const fz: number = fy - b / 200;
 
   const x: number = fx ** 3 > eps ? fx ** 3 : (116 * fx - 16) / kappa;
   const y: number = L > kappa * eps ? ((L + 16) / 116) ** 3 : L / kappa;
@@ -58,7 +58,7 @@ export function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
 }
 
 export function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
-  const {x, y, z } = color;
+  const { x, y, z } = color;
 
   const fx: number = x > eps ? x ** (1 / 3) : (kappa * x + 16) / 116;
   const fy: number = y > eps ? y ** (1 / 3) : (kappa * y + 16) / 116;
@@ -192,4 +192,52 @@ function deg(rad: number): number {
 
 function rad(deg: number): number {
   return deg * Math.PI / 180;
+}
+
+
+export function check_conversion() {
+  const xyz1: ColorXYZ = {x: Math.random(), y: Math.random(), z: Math.random()};
+  const lab1: ColorLAB = XYZ_to_LAB(xyz1);
+  const hlc: ColorHLC = LAB_to_HLC(lab1);
+  const lab2: ColorLAB = HLC_to_LAB(hlc);
+  const xyz2: ColorXYZ = LAB_to_XYZ(lab2);
+  console.log("xyz", xyz1, "lab", lab1, "hlc", hlc, "lab", lab2, "xyz", xyz2);
+}
+
+export function check_CIEDE2000() {
+  let i = 1;
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.6772, b: -79.7751 }, { L: 50.0000, a: 0.0000, b: -82.7485 }) - 2.0425)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 3.1571, b: -77.2803 }, { L: 50.0000, a: 0.0000, b: -82.7485 }) - 2.8615)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.8361, b: -74.0200 }, { L: 50.0000, a: 0.0000, b: -82.7485 }) - 3.4412)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -1.3802, b: -84.2814 }, { L: 50.0000, a: 0.0000, b: -82.7485 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -1.1848, b: -84.8006 }, { L: 50.0000, a: 0.0000, b: -82.7485 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -0.9009, b: -85.5211 }, { L: 50.0000, a: 0.0000, b: -82.7485 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 0.0000, b: 0.0000 }, { L: 50.0000, a: -1.0000, b: 2.0000 }) - 2.3669)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -1.0000, b: 2.0000 }, { L: 50.0000, a: 0.0000, b: 0.0000 }) - 2.3669)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.4900, b: -0.0010 }, { L: 50.0000, a: -2.4900, b: 0.0009 }) - 7.1792)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.4900, b: -0.0010 }, { L: 50.0000, a: -2.4900, b: 0.0010 }) - 7.1792)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.4900, b: -0.0010 }, { L: 50.0000, a: -2.4900, b: 0.0011 }) - 7.2195)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.4900, b: -0.0010 }, { L: 50.0000, a: -2.4900, b: 0.0012 }) - 7.2195)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -0.0010, b: 2.4900 }, { L: 50.0000, a: 0.0009, b: -2.4900 }) - 4.8045)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -0.0010, b: 2.4900 }, { L: 50.0000, a: 0.0010, b: -2.4900 }) - 4.8045)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: -0.0010, b: 2.4900 }, { L: 50.0000, a: 0.0011, b: -2.4900 }) - 4.7461)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 50.0000, a: 0.0000, b: -2.5000 }) - 4.3065)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 73.0000, a: 25.0000, b: -18.0000 }) - 27.1492)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 61.0000, a: -5.0000, b: 29.0000 }) - 22.8977)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 56.0000, a: -27.0000, b: -3.0000 }) - 31.9030)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 58.0000, a: 24.0000, b: 15.0000 }) - 19.4535)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 50.0000, a: 3.1736, b: 0.5854 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 50.0000, a: 3.2972, b: 0.0000 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 50.0000, a: 1.8634, b: 0.5757 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 50.0000, a: 2.5000, b: 0.0000 }, { L: 50.0000, a: 3.2592, b: 0.3350 }) - 1.0000)
+  console.log(i++, CIEDE2000({ L: 60.2574, a: -34.0099, b: 36.2677 }, { L: 60.4626, a: -34.1751, b: 39.4387 }) - 1.2644)
+  console.log(i++, CIEDE2000({ L: 63.0109, a: -31.0961, b: -5.8663 }, { L: 62.8187, a: -29.7946, b: -4.0864 }) - 1.2630)
+  console.log(i++, CIEDE2000({ L: 61.2901, a: 3.7196, b: -5.3901 }, { L: 61.4292, a: 2.2480, b: -4.9620 }) - 1.8731)
+  console.log(i++, CIEDE2000({ L: 35.0831, a: -44.1164, b: 3.7933 }, { L: 35.0232, a: -40.0716, b: 1.5901 }) - 1.8645)
+  console.log(i++, CIEDE2000({ L: 22.7233, a: 20.0904, b: -46.6940 }, { L: 23.0331, a: 14.9730, b: -42.5619 }) - 2.0373)
+  console.log(i++, CIEDE2000({ L: 36.4612, a: 47.8580, b: 18.3852 }, { L: 36.2715, a: 50.5065, b: 21.2231 }) - 1.4146)
+  console.log(i++, CIEDE2000({ L: 90.8027, a: -2.0831, b: 1.4410 }, { L: 91.1528, a: -1.6435, b: 0.0447 }) - 1.4441)
+  console.log(i++, CIEDE2000({ L: 90.9257, a: -0.5406, b: -0.9208 }, { L: 88.6381, a: -0.8985, b: -0.7239 }) - 1.5381)
+  console.log(i++, CIEDE2000({ L: 6.7747, a: -0.2908, b: -2.4247 }, { L: 5.8714, a: -0.0985, b: -2.2286 }) - 0.6377)
+  console.log(i++, CIEDE2000({ L: 2.0776, a: 0.0795, b: -1.1350 }, { L: 0.9033, a: -0.0636, b: -0.5514 }) - 0.9082)
 }

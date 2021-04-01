@@ -15,24 +15,15 @@ class Palette extends React.Component<PaletteProps> {
     for (let i = 1; i < props.n; i++) {
       this.colors.push(XYZ_to_HLC({ x: Math.random(), y: Math.random(), z: Math.random() }));
     }
-    // this.colors = [props.base, props.color1];
-    // for (let i = 1; i < props.n; i++) {
-    //   this.colors.push({ x: Math.random(), y: Math.random(), z: Math.random() });
-    // }
   }
 
   private colors: Array<ColorHLC>;
-  // private colors: Array<ColorXYZ>;
 
   render(): JSX.Element {
     const items = this.colors.map((color: ColorHLC) => {
-    // const items = this.colors.map((color: ColorXYZ) => {
       const xyz = HLC_to_XYZ(color);
-      // const xyz = color;
-      // const hlc = XYZ_to_HLC(xyz);
       const rgb = "rgb(" + 255 * xyz.x + "," + 255 * xyz.y + "," + 255 * xyz.z + ")"
-      return(<Circle x={color.H} y={color.C} r={color.L} color={rgb} />)
-      // return(<Circle x={hlc.H + 180} y={hlc.C} r={hlc.L} color={rgb} />)
+      return(<Circle key={"circle_" + rgb} x={2 * color.H + 360} y={2.5 * color.C} r={color.L} color={rgb} />)
     });
     return (
       <div>
