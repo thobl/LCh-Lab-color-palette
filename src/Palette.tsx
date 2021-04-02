@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorRGB, ColorLAB, RGB_to_LAB, LAB_to_CSS, LAB_to_HLC } from './Color'
+import { ColorRGB, ColorLAB, RGB_to_LAB, LAB_to_CSS, LAB_to_HLC, CIEDE2000 } from './Color'
 import Circle from './Circle'
 
 interface PaletteProps {
@@ -32,7 +32,11 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
         b: randomInt(-128, 127)
       });
     }
+
+    this.base_dist = CIEDE2000(this.state.colors[0], this.state.colors[1]);
   }
+
+  private readonly base_dist;
 
   private x(color: ColorLAB): number {
     if (drawHLC) {
@@ -57,37 +61,114 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   }
 
   render(): JSX.Element {
-    const items = this.state.colors.map((color: ColorLAB) => {
-      const rss_color: string = LAB_to_CSS(color);
-      return (<Circle key={"circle_" + rss_color} x={this.x(color)} y={this.y(color)} r={this.r(color)} color={rss_color} />);
+    let id = 0;
+    const items_circles = this.state.colors.map((color: ColorLAB) => {
+      const css_color: string = LAB_to_CSS(color);
+      return (<Circle key={"circle_" + id++} x={this.x(color)} y={this.y(color)} r={this.r(color)} color={css_color} />);
+    });
+    
+    const base: ColorLAB =  this.state.colors[0];
+    const css_base: string = LAB_to_CSS(base);
+    const items_rows = this.state.colors.map((color: ColorLAB) => {
+      const css_color: string = LAB_to_CSS(color);
+      return(
+        <div style={{ background: css_base, color: css_color, padding: '5px'}}>
+          {CIEDE2000(color, base).toFixed(2)}
+        </div>
+      );
     });
     return (
+      <div>
       <div className="Canvas" style={{ position: 'relative', border: '1px solid', width: w + 'px', height: h + 'px' }}>
-        {items}
+        {items_circles}
+      </div>
+      <div>
+      {items_rows}
+      </div>
       </div>
     );
   }
 
   async componentDidMount() {
-    return;
-    for (let i = 0; i < 100; i++) {
-      await sleep(40);
-      let colors = this.state.colors;
-      for (let color of colors) {
-        color.L += randomInt(-2, 2);
-        color.L = Math.max(0, Math.min(100, color.L))
-        color.a += randomInt(-2, 2);
-        color.a = Math.max(-128, Math.min(127, color.a))
-        color.b += randomInt(-2, 2);
-        color.b = Math.max(-128, Math.min(127, color.b))
+    let colors: Array<ColorLAB> = this.state.colors;
+
+    for (let i = 0; i < 500; i++) {
+      await sleep(10);
+      let forces: Array<ColorLAB> = new Array(colors.length).fill({ L: 0, a: 0, b: 0 });
+      for (let c1 = 2; c1 < colors.length; c1++) {
+        forces[c1] = this.forceBase(colors[c1]);
+        for (let c2 = 1; c2 < colors.length; c2++) {
+          if (c1 === c2) continue;
+          forces[c1] = add(forces[c1], this.forcePair(colors[c1], colors[c2]));
+        }
+      }
+      for (let c1 = 2; c1 < colors.length; c1++) {
+        colors[c1] = clip(add(colors[c1], forces[c1]));
       }
       this.setState({ colors: colors });
     }
   }
+
+  forceBase(color: ColorLAB): ColorLAB {
+    const base: ColorLAB = this.state.colors[0];
+    const dist: number = CIEDE2000(base, color);
+    const diff: number = Math.abs(dist - this.base_dist);
+    const sign: number = Math.sign(dist - this.base_dist);
+    const direction: ColorLAB = normalize(sub(base, color));
+    const res: ColorLAB = mul(direction, 0.03 * sign * diff ** 2);
+    return res;
+  }
+
+  forcePair(color: ColorLAB, other: ColorLAB): ColorLAB {
+    const dist: number = CIEDE2000(other, color);
+    const direction: ColorLAB = normalize(sub(color, other));
+    const res: ColorLAB = mul(direction, 1 / (dist ** 0.5));
+    return res;
+  }
+}
+
+function clip(color: ColorLAB): ColorLAB {
+  // return color;
+  let res: ColorLAB = {
+    L: Math.max(0, Math.min(100, color.L)),
+    a: Math.max(-128, Math.min(127, color.a)),
+    b: Math.max(-128, Math.min(127, color.b))
+  };
+  return res;
+}
+
+function add(col1: ColorLAB, col2: ColorLAB): ColorLAB {
+  let res: ColorLAB = {
+    L: col1.L + col2.L,
+    a: col1.a + col2.a,
+    b: col1.b + col2.b
+  };
+  return res;
+}
+
+function sub(col1: ColorLAB, col2: ColorLAB): ColorLAB {
+  let res: ColorLAB = {
+    L: col1.L - col2.L,
+    a: col1.a - col2.a,
+    b: col1.b - col2.b
+  };
+  return res;
+}
+
+function mul(color: ColorLAB, factor: number): ColorLAB {
+  color.L *= factor;
+  color.a *= factor;
+  color.b *= factor;
+  return color;
+}
+
+function normalize(color: ColorLAB): ColorLAB {
+  let len = Math.sqrt(color.L ** 2 + color.a ** 2 + color.b ** 2);
+  return mul(color, 1 / len);
 }
 
 // min and max are inclusive
-export function randomInt(min: number, max: number): number {
+function randomInt(min: number, max: number): number {
   min = Math.ceil(min);
   max = Math.floor(max) + 1;
   return Math.floor(Math.random() * (max - min) + min);
