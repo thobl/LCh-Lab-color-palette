@@ -12,10 +12,10 @@ class Circle extends React.Component<CircleProps> {
     return (
       <div style={{
         backgroundColor: this.props.color,
-        left: this.props.x,
-        top: this.props.y,
-        width: this.props.r,
-        height: this.props.r,
+        left: this.props.x - this.props.r,
+        top: this.props.y - this.props.r,
+        width: this.props.r * 2,
+        height: this.props.r * 2,
         position: 'absolute',
         borderRadius: '50%',
         border: '1px solid'

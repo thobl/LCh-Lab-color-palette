@@ -9,9 +9,7 @@ class App extends React.Component {
     // check_conversion();
     return (
       <div>
-        <div className="Canvas" style={{ border: '1px solid', width: '800px', height: '800px' }}>
-          <Palette base={{ x: 0.9, y: 0.9, z: 0.9 }} color1={{ x: 0.9, y: 0.1, z: 0.1 }} n={15} />
-        </div>
+          <Palette base={{ R: 0.9, G: 0.9, B: 0.9 }} color1={{ R: 0, G:  178.47 / 255, B: 1.0 }} n={500} />
       </div>
     )
   }

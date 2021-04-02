@@ -15,15 +15,21 @@ export interface ColorLAB {
 }
 
 export interface ColorXYZ {
-  x: number;
-  y: number;
-  z: number;
+  X: number;
+  Y: number;
+  Z: number;
+}
+
+export interface ColorRGB {
+  R: number;
+  G: number;
+  B: number;
 }
 
 //////////////////////////////////////////////////////////////////////
-// conversion between color types; see www.brucelindbloom.com and
-// en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model
+// conversion between color types
 
+// en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model
 export function HLC_to_LAB(color: ColorHLC): ColorLAB {
   return {
     L: color.L,
@@ -32,6 +38,7 @@ export function HLC_to_LAB(color: ColorHLC): ColorLAB {
   };
 }
 
+// en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model
 export function LAB_to_HLC(color: ColorLAB): ColorHLC {
   return {
     H: deg(Math.atan2(color.b, color.a)),
@@ -40,34 +47,81 @@ export function LAB_to_HLC(color: ColorLAB): ColorHLC {
   };
 }
 
-const eps: number = 216 / 24389;
-const kappa: number = 24389 / 27;
+// const eps: number = 216 / 24389;
+// const kappa: number = 24389 / 27;
+// Standard Illuminant D65
+const ref_white: ColorXYZ = { X: 95.0489, Y: 100, Z: 108.8840 }
 
+// https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ
 export function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
   const { L, a, b } = color;
 
-  const fy: number = (L + 16) / 116;
-  const fx: number = a / 500 + fy;
-  const fz: number = fy - b / 200;
-
-  const x: number = fx ** 3 > eps ? fx ** 3 : (116 * fx - 16) / kappa;
-  const y: number = L > kappa * eps ? ((L + 16) / 116) ** 3 : L / kappa;
-  const z: number = fz ** 3 > eps ? fz ** 3 : (116 * fz - 16) / kappa;
-
-  return { x: x, y: y, z: z };
-}
-
-export function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
-  const { x, y, z } = color;
-
-  const fx: number = x > eps ? x ** (1 / 3) : (kappa * x + 16) / 116;
-  const fy: number = y > eps ? y ** (1 / 3) : (kappa * y + 16) / 116;
-  const fz: number = z > eps ? z ** (1 / 3) : (kappa * z + 16) / 116;
+  const f_ = (t: number): number => {
+    const delta = 6 / 29;
+    if (t > delta) return t ** 3;
+    return 3 * delta ** 2 * (t - 4 / 29);
+  };
 
   return {
-    L: 116 * fy - 16,
-    a: 500 * (fx - fy),
-    b: 200 * (fy - fz)
+    X: ref_white.X * f_((L + 16) / 116 + a / 500),
+    Y: ref_white.Y * f_((L + 16) / 116),
+    Z: ref_white.Z * f_((L + 16) / 116 - b / 200)
+  };
+}
+
+// https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB[11]
+export function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
+  const { X, Y, Z } = color;
+
+  const f = (t: number): number => {
+    const delta = 6 / 29;
+    if (t > delta ** 3) return t ** (1 / 3);
+    return t / (2 * delta ** 2) + 4 / 29;
+  }
+
+  const x: number = X / ref_white.X;
+  const y: number = Y / ref_white.Y;
+  const z: number = Z / ref_white.Z;
+
+  return {
+    L: 116 * f(y) - 16,
+    a: 500 * (f(x) - f(y)),
+    b: 200 * (f(y) - f(z))
+  };
+}
+
+// https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
+export function XYZ_to_RGB(color: ColorXYZ): ColorRGB {
+  const { X, Y, Z } = color;
+  const r: number = 3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z;
+  const g: number = -0.9692660 * X + 1.8760108 * Y + 0.0415560 * Z;
+  const b: number = 0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z;
+
+  const gamma = (u: number): number => {
+    if (u < 0.0031308) return 12.92 * u;
+    return 1.055 * u ** (1 / 2.4) - 0.055;
+  }
+  return {
+    R: gamma(r / 100),
+    G: gamma(g / 100),
+    B: gamma(b / 100)
+  };
+}
+
+// https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
+export function RGB_to_XYZ(color: ColorRGB): ColorXYZ {
+  const { R, G, B } = color;
+  const gamma_ = (u: number): number => {
+    if (u < 0.04045) return u / 12.92;
+    return ((u + 0.055) / 1.055) ** 2.4;
+  }
+  const r = gamma_(R);
+  const g = gamma_(G);
+  const b = gamma_(B);
+  return {
+    X: (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) * 100,
+    Y: (0.2126729 * r + 0.7151522 * g + 0.0721750 * b) * 100,
+    Z: (0.0193339 * r + 0.1191920 * g + 0.9503041 * b) * 100
   };
 }
 
@@ -79,17 +133,38 @@ export function HLC_to_XYZ(color: ColorHLC): ColorXYZ {
   return LAB_to_XYZ(HLC_to_LAB(color));
 }
 
+export function RGB_to_LAB(color: ColorRGB): ColorLAB {
+  return XYZ_to_LAB(RGB_to_XYZ(color));
+}
+
+export function LAB_to_RGB(color: ColorLAB): ColorRGB {
+  return XYZ_to_RGB(LAB_to_XYZ(color));
+}
+
+export function RGB_to_HLC(color: ColorRGB): ColorHLC {
+  return XYZ_to_HLC(RGB_to_XYZ(color));
+}
+
+export function HLC_to_RGB(color: ColorHLC): ColorRGB {
+  return XYZ_to_RGB(HLC_to_XYZ(color));
+}
+
+export function RGB_to_CSS(color: ColorRGB): string {
+  return "rgb(" + 255 * color.R + "," + 255 * color.G + "," + 255 * color.B + ")";
+}
+
 export function XYZ_to_CSS(color: ColorXYZ): string {
-  return "rgb(" + 255 * color.x + "," + 255 * color.y + "," + 255 * color.z + ")";
+  return RGB_to_CSS(XYZ_to_RGB(color));
 }
 
 export function LAB_to_CSS(color: ColorLAB): string {
-  return XYZ_to_CSS(LAB_to_XYZ(color));
+  return RGB_to_CSS(LAB_to_RGB(color));
 }
 
 export function HLC_to_CSS(color: ColorHLC): string {
-  return XYZ_to_CSS(HLC_to_XYZ(color));
+  return RGB_to_CSS(HLC_to_RGB(color));
 }
+
 
 //////////////////////////////////////////////////////////////////////
 // difference according to CIEDE2000; see
@@ -208,12 +283,21 @@ function rad(deg: number): number {
 
 
 export function check_conversion() {
-  const xyz1: ColorXYZ = {x: Math.random(), y: Math.random(), z: Math.random()};
+  // const rgb1: ColorRGB = {R: Math.random(), G: Math.random(), B: Math.random()};
+  const rgb1: ColorRGB = { R: 100 / 255, G: 241 / 255, B: 2 / 255 };
+  const xyz1: ColorXYZ = RGB_to_XYZ(rgb1);
   const lab1: ColorLAB = XYZ_to_LAB(xyz1);
   const hlc: ColorHLC = LAB_to_HLC(lab1);
   const lab2: ColorLAB = HLC_to_LAB(hlc);
   const xyz2: ColorXYZ = LAB_to_XYZ(lab2);
-  console.log("xyz", xyz1, "lab", lab1, "hlc", hlc, "lab", lab2, "xyz", xyz2);
+  const rgb2: ColorRGB = XYZ_to_RGB(xyz2);
+  console.log("rgb", rgb1);
+  console.log("xyz", xyz1);
+  console.log("lab", lab1);
+  console.log("hlc", hlc);
+  console.log("lab", lab2);
+  console.log("xyz", xyz2);
+  console.log("rgb", rgb2);
 }
 
 export function check_CIEDE2000() {
