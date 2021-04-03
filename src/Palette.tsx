@@ -100,8 +100,8 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   async componentDidMount() {
     let colors: Array<ColorLAB> = this.state.colors;
 
-    for (let i = 0; i < 100; i++) {
-      await sleep(10);
+    for (let i = 0; i < 600; i++) {
+      await sleep(1);
       let forces: Array<ColorLAB> = new Array(colors.length).fill({ L: 0, a: 0, b: 0 });
       for (let c1 = 2; c1 < colors.length; c1++) {
         forces[c1] = this.forceBase(colors[c1]);
@@ -123,14 +123,14 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     const diff: number = Math.abs(dist - this.base_dist);
     const sign: number = Math.sign(dist - this.base_dist);
     const direction: ColorLAB = normalize(sub(base, color));
-    const res: ColorLAB = mul(direction, 0.03 * sign * diff ** 2);
+    const res: ColorLAB = mul(direction, 0.4 * sign * diff ** 1);
     return res;
   }
 
   forcePair(color: ColorLAB, other: ColorLAB): ColorLAB {
     const dist: number = CIEDE2000(other, color);
     const direction: ColorLAB = normalize(sub(color, other));
-    const res: ColorLAB = mul(direction, 1 / (dist ** 0.2));
+    const res: ColorLAB = mul(direction, 40 / (dist ** 1.5));
     return res;
   }
 }
