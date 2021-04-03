@@ -27,7 +27,8 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     this.state = { colors: [RGB_to_LAB(props.base), RGB_to_LAB(props.color1)] }
     for (let i = 1; i < props.n; i++) {
       this.state.colors.push({
-        L: randomInt(0, 100),
+        // L: randomInt(0, 100),
+        L: RGB_to_LAB(props.color1).L,
         a: randomInt(-128, 127),
         b: randomInt(-128, 127)
       });
@@ -123,14 +124,16 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     const diff: number = Math.abs(dist - this.base_dist);
     const sign: number = Math.sign(dist - this.base_dist);
     const direction: ColorLAB = normalize(sub(base, color));
-    const res: ColorLAB = mul(direction, 0.4 * sign * diff ** 1);
+    const res: ColorLAB = mul(direction, 0.05 * sign * diff ** 2);
+    res.L = 0;
     return res;
   }
 
   forcePair(color: ColorLAB, other: ColorLAB): ColorLAB {
     const dist: number = CIEDE2000(other, color);
     const direction: ColorLAB = normalize(sub(color, other));
-    const res: ColorLAB = mul(direction, 40 / (dist ** 1.5));
+    const res: ColorLAB = mul(direction, 60 / (dist ** 1.5));
+    res.L = 0;
     return res;
   }
 }
