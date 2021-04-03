@@ -66,25 +66,33 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       const css_color: string = LAB_to_CSS(color);
       return (<Circle key={"circle_" + id++} x={this.x(color)} y={this.y(color)} r={this.r(color)} color={css_color} />);
     });
-    
-    const base: ColorLAB =  this.state.colors[0];
-    const css_base: string = LAB_to_CSS(base);
-    const items_rows = this.state.colors.map((color: ColorLAB) => {
-      const css_color: string = LAB_to_CSS(color);
-      return(
-        <div style={{ background: css_base, color: css_color, padding: '5px'}}>
-          {CIEDE2000(color, base).toFixed(2)}
+
+    let color_pairs: Array<Array<ColorLAB>> = [];
+    for (let color1 of this.state.colors) {
+      for (let color2 of this.state.colors) {
+        color_pairs.push([color1, color2]);
+      }
+    }
+
+    const items_pairs = color_pairs.map((colors: Array<ColorLAB>) => {
+      const css_color1: string = LAB_to_CSS(colors[0]);
+      const css_color2: string = LAB_to_CSS(colors[1]);
+      return (
+        <div key={id++} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: css_color1, color: css_color2}}>
+          {CIEDE2000(colors[0], colors[1]).toFixed(2)}
         </div>
       );
     });
+
+    const repeat: string = 'repeat(' + this.state.colors.length + ', 70px)';
     return (
-      <div>
-      <div className="Canvas" style={{ position: 'relative', border: '1px solid', width: w + 'px', height: h + 'px' }}>
-        {items_circles}
-      </div>
-      <div>
-      {items_rows}
-      </div>
+      <div style={{display: 'flex'}}>
+        <div className="Canvas" style={{ position: 'relative', border: '1px solid', width: w + 'px', height: h + 'px' }}>
+          {items_circles}
+        </div>
+        <div style={{ display: 'grid', gridGap: '2px', gridTemplateColumns: repeat, gridTemplateRows: repeat, margin: '10px'}}>
+          {items_pairs}
+        </div>
       </div>
     );
   }
@@ -92,7 +100,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   async componentDidMount() {
     let colors: Array<ColorLAB> = this.state.colors;
 
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 100; i++) {
       await sleep(10);
       let forces: Array<ColorLAB> = new Array(colors.length).fill({ L: 0, a: 0, b: 0 });
       for (let c1 = 2; c1 < colors.length; c1++) {
@@ -122,7 +130,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   forcePair(color: ColorLAB, other: ColorLAB): ColorLAB {
     const dist: number = CIEDE2000(other, color);
     const direction: ColorLAB = normalize(sub(color, other));
-    const res: ColorLAB = mul(direction, 1 / (dist ** 0.5));
+    const res: ColorLAB = mul(direction, 1 / (dist ** 0.2));
     return res;
   }
 }
