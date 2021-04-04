@@ -63,16 +63,6 @@ export default class ColorInput extends React.Component<ColorInputProps> {
     return (
       <div className='ColorInput'>
         <div className='ColorInputControls'>
-          {input('L', 'sld', 0, 100, HLC_to_LAB, LAB_to_HLC)}
-          {input('L', 'txt', 0, 100, HLC_to_LAB, LAB_to_HLC)}
-          <span className='Spacer'> </span>
-          {input('a', 'sld', -128, 127, HLC_to_LAB, LAB_to_HLC)}
-          {input('a', 'txt', -128, 127, HLC_to_LAB, LAB_to_HLC)}
-          <span className='Spacer'> </span>
-          {input('b', 'sld', -128, 127, HLC_to_LAB, LAB_to_HLC)}
-          {input('b', 'txt', -128, 127, HLC_to_LAB, LAB_to_HLC)}
-        </div>
-        <div className='ColorInputControls'>
           {input('L', 'sld', 0, 100, identity, identity)}
           {input('L', 'txt', 0, 100, identity, identity)}
           <span className='Spacer'> </span>
@@ -81,6 +71,16 @@ export default class ColorInput extends React.Component<ColorInputProps> {
           <span className='Spacer'> </span>
           {input('C', 'sld', 0, 180, identity, identity)}
           {input('C', 'txt', 0, 180, identity, identity)}
+        </div>
+        <div className='ColorInputControls'>
+          {input('L', 'sld', 0, 100, HLC_to_LAB, LAB_to_HLC)}
+          {input('L', 'txt', 0, 100, HLC_to_LAB, LAB_to_HLC)}
+          <span className='Spacer'> </span>
+          {input('a', 'sld', -128, 127, HLC_to_LAB, LAB_to_HLC)}
+          {input('a', 'txt', -128, 127, HLC_to_LAB, LAB_to_HLC)}
+          <span className='Spacer'> </span>
+          {input('b', 'sld', -128, 127, HLC_to_LAB, LAB_to_HLC)}
+          {input('b', 'txt', -128, 127, HLC_to_LAB, LAB_to_HLC)}
         </div>
         <div className='ColorInputPreviewRow' >
           <input className='ParamInput' value={HLC_to_Hex(color)} onChange={onChangeHex} />

@@ -64,6 +64,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
 
   componentDidUpdate(prevProps: PaletteProps, prevState: PaletteState) {
     if (prevState.n !== this.state.n
+      || prevState.n_base !== this.state.n_base
       || prevState.offset !== this.state.offset
       || prevState.L !== this.state.L
       || prevState.C !== this.state.C) {
@@ -72,7 +73,12 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   }
 
   private initializeColors() {
-    let colors: Array<ColorHLC> = [{ H: 0, L: 100, C: 0 }, { H: 0, L: 30, C: 0 }];
+    let colors: Array<ColorHLC> = [];
+    const n_base = this.state.n_base;
+    for (let i = n_base; i > 0; i--) {
+      colors.push({
+        H: 0, L: 30 + (i - 1) * 70 / (n_base - 1), C: 0})
+    }
     const n: number = this.state.n;
     for (let i = 0; i < n; i++) {
       colors.push({
@@ -109,6 +115,10 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
           <input name='drawHLC' type='checkbox' checked={this.state.drawHLC}
             onChange={(e) => this.setState({ ['drawHLC']: e.target.checked })} />
           <label htmlFor='drawHLC'>draw as HLC (LAB otherwise)</label>
+          <div>
+            number of base colors: <input className='ParamInput' value={this.state.n_base}
+              onChange={(e) => this.setState({ ['n_base']: parseInt(e.target.value) })} />
+          </div>
           <div>
             number of colors: <input className='ParamInput' value={this.state.n}
               onChange={(e) => this.setState({ ['n']: parseInt(e.target.value) })} />
