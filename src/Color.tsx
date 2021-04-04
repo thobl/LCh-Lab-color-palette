@@ -101,11 +101,13 @@ export function XYZ_to_RGB(color: ColorXYZ): ColorRGB {
     if (u < 0.0031308) return 12.92 * u;
     return 1.055 * u ** (1 / 2.4) - 0.055;
   }
-  return {
-    R: gamma(r / 100),
-    G: gamma(g / 100),
-    B: gamma(b / 100)
+
+  const res: ColorRGB = {
+    R: Math.min(1, Math.max(0, gamma(r / 100))),
+    G: Math.min(1, Math.max(0, gamma(g / 100))),
+    B: Math.min(1, Math.max(0, gamma(b / 100)))
   };
+  return res;
 }
 
 // https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
@@ -147,6 +149,33 @@ export function RGB_to_HLC(color: ColorRGB): ColorHLC {
 
 export function HLC_to_RGB(color: ColorHLC): ColorRGB {
   return XYZ_to_RGB(HLC_to_XYZ(color));
+}
+
+export function RGB_to_Hex(color: ColorRGB): string {
+  const to_hex = (x: number) => {
+    const hex = Math.round(x).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }
+  return "#" + to_hex(255 * color.R) + to_hex(255 * color.G) + to_hex(255 * color.B);
+}
+
+export function Hex_to_RGB(color: string): ColorRGB {
+  let match = /#([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})/.exec(color);
+  if (match)
+    return {
+      R: parseInt(match[1], 16) / 255,
+      G: parseInt(match[2], 16) / 255,
+      B: parseInt(match[3], 16) / 255
+    };
+  return { R: NaN, G: NaN, B: NaN };
+}
+
+export function LAB_to_Hex(color: ColorLAB): string {
+  return RGB_to_Hex(LAB_to_RGB(color));
+}
+
+export function Hex_to_LAB(color: string): ColorLAB {
+  return RGB_to_LAB(Hex_to_RGB(color));
 }
 
 export function RGB_to_CSS(color: ColorRGB): string {

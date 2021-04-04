@@ -26,3 +26,8 @@
     border: 1px solid;
     padding: 2px;
 }
+
+.HexInput {
+    width: 70px;
+    text-align: center;
+}

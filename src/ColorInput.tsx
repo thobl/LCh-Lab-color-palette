@@ -1,5 +1,5 @@
 import React from 'react'
-import { CIEDE2000, ColorLAB, LAB_to_CSS } from './Color';
+import { CIEDE2000, ColorLAB, ColorRGB, ColorXYZ, Hex_to_LAB, LAB_to_CSS, LAB_to_Hex, LAB_to_RGB, LAB_to_XYZ } from './Color';
 
 interface ColorInputProps {
   colors: Array<ColorLAB>;
@@ -23,6 +23,11 @@ export default class ColorInput extends React.Component<ColorInputProps> {
       }
     }
 
+    const onChangeHex = (e: React.ChangeEvent<HTMLInputElement>) => {
+      colors[id] = Hex_to_LAB(e.target.value);
+      this.props.handler(colors);
+    }
+
     let id2: number = 0;
     const preview_boxes = colors.map((color2: ColorLAB) => {
       const css_color1: string = LAB_to_CSS(color);
@@ -34,6 +39,9 @@ export default class ColorInput extends React.Component<ColorInputProps> {
       );
     });
 
+    const xyz: ColorXYZ = LAB_to_XYZ(color);
+    const rgb: ColorRGB = LAB_to_RGB(color);
+    // 
     return (
       <div className='ColorInput'>
         <div className='ColorInputPreviewRow' >
@@ -49,6 +57,13 @@ export default class ColorInput extends React.Component<ColorInputProps> {
           <input className='LABslider' type='range' min='-128' max='127' value={color.b} onChange={onChangeFunction('b')} />
           <input className='LABInput' value={color.b} onChange={onChangeFunction('b')} />
         </div>
+        <input className='HexInput' value={LAB_to_Hex(color)} onChange={onChangeHex} />
+        <span className='Spacer'> </span>
+        RGB: {(rgb.R * 255).toFixed(0) + ', ' + (rgb.G * 255).toFixed(0) + ', ' + (rgb.B * 255).toFixed(0)}
+        <span className='Spacer'> </span>
+        rgb: {rgb.R.toFixed(3) + ', ' + rgb.G.toFixed(3) + ', ' + rgb.B.toFixed(3)}
+        <span className='Spacer'> </span>
+        XYZ: {xyz.X.toFixed(2) + ', ' + xyz.Y.toFixed(2) + ', ' + xyz.Z.toFixed(2)}
       </div>
     );
   }
