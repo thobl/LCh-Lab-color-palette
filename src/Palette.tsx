@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorHLC, ColorLAB, HLC_to_CSS, HLC_to_LAB, LAB_to_CSS, LAB_to_HLC } from './Color'
+import { ColorHLC, HLC_to_CSS, HLC_to_LAB } from './Color'
 import Circle from './Circle'
 import ColorInput from './ColorInput';
 
@@ -26,7 +26,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   constructor(props: PaletteProps) {
     super(props);
     this.state = {
-      colors: [{ H: 0, L: 100, C: 0 }, { H: 0, L: 30, C: 0 }],
+      colors: [],
       drawHLC: false,
       n_base: 2,
       n: 8,
@@ -34,14 +34,6 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       L: 50,
       C: 90
     };
-    const n: number = this.state.n;
-    for (let i = 0; i < n; i++) {
-      this.state.colors.push({
-        H: -180 + (i + this.state.offset) * 360 / n,
-        L: this.state.L,
-        C: this.state.C
-      });
-    }
   }
 
   private x(color: ColorHLC): number {
@@ -66,6 +58,32 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     return color.L / 100 * (r - min) + min;
   }
 
+  componentDidMount() {
+    this.initializeColors();
+  }
+
+  componentDidUpdate(prevProps: PaletteProps, prevState: PaletteState) {
+    if (prevState.n !== this.state.n
+      || prevState.offset !== this.state.offset
+      || prevState.L !== this.state.L
+      || prevState.C !== this.state.C) {
+      this.initializeColors();
+    }
+  }
+
+  private initializeColors() {
+    let colors: Array<ColorHLC> = [{ H: 0, L: 100, C: 0 }, { H: 0, L: 30, C: 0 }];
+    const n: number = this.state.n;
+    for (let i = 0; i < n; i++) {
+      colors.push({
+        H: -180 + (i + this.state.offset) * 360 / n,
+        L: this.state.L,
+        C: this.state.C
+      });
+    }
+    this.setState({ ['colors']: colors });
+  }
+
   render(): JSX.Element {
     let id: number = 0;
     const circles = this.state.colors.map((color: ColorHLC): JSX.Element => {
@@ -88,8 +106,25 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
           <div className="CircleBox" style={{ width: w + 'px', height: h + 'px' }}>
             {circles}
           </div>
-          <input name='drawHLC' type='checkbox' checked={this.state.drawHLC} onChange={(e) => this.setState({ ['drawHLC']: e.target.checked })} />
+          <input name='drawHLC' type='checkbox' checked={this.state.drawHLC}
+            onChange={(e) => this.setState({ ['drawHLC']: e.target.checked })} />
           <label htmlFor='drawHLC'>draw as HLC (LAB otherwise)</label>
+          <div>
+            number of colors: <input className='ParamInput' value={this.state.n}
+              onChange={(e) => this.setState({ ['n']: parseInt(e.target.value) })} />
+          </div>
+          <div>
+            <input className='Slider' type='range' min='0' max='100' value={100 * this.state.offset}
+              onChange={(e) => this.setState({ ['offset']: parseFloat(e.target.value) / 100 })} />
+          </div>
+          <div>
+            <input className='Slider' type='range' min='0' max='100' value={this.state.L}
+              onChange={(e) => this.setState({ ['L']: parseFloat(e.target.value) })} />
+          </div>
+          <div>
+            <input className='Slider' type='range' min='0' max='180' value={this.state.C}
+              onChange={(e) => this.setState({ ['C']: parseFloat(e.target.value) })} />
+          </div>
         </div>
         <div>
           {inputs}

@@ -1,6 +1,5 @@
-
 import React from 'react'
-import { CIEDE2000, ColorHLC, ColorLAB, Hex_to_HLC, HLC_to_LAB, LAB_to_CSS, HLC_to_Hex, LAB_to_HLC, HLC_to_CSS, Color } from './Color';
+import { CIEDE2000, ColorHLC, Hex_to_HLC, HLC_to_LAB, HLC_to_Hex, LAB_to_HLC, HLC_to_CSS, Color } from './Color';
 
 interface ColorInputProps {
   colors: Array<ColorHLC>;
@@ -32,9 +31,9 @@ export default class ColorInput extends React.Component<ColorInputProps> {
         this.props.handler(colors);
       }
 
-      if (inputType == 'txt') {
+      if (inputType === 'txt') {
         return (
-          <input className='ParamInput' value={col[prop].toFixed(2)} onChange={onChange} />
+          <input className='ParamInput' value={Math.round(col[prop])} onChange={onChange} />
         );
       }
       return (
