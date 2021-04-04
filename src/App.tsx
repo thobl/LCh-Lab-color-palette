@@ -9,10 +9,7 @@ class App extends React.Component {
     // check_conversion();
     return (
       <div>
-        <Palette
-          base={{ R: 0 / 255, G: 0 / 255, B: 0 / 255 }}
-          color1={{ R: 255 / 255, G: 233 / 255, B: 112 / 255 }}
-          n={16} />
+        <Palette n={10} />
       </div>
     )
   }

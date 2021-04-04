@@ -1,10 +1,9 @@
 import React from 'react'
-import { ColorRGB, ColorLAB, RGB_to_LAB, LAB_to_CSS, LAB_to_HLC, CIEDE2000 } from './Color'
+import { ColorLAB, LAB_to_CSS, LAB_to_HLC } from './Color'
 import Circle from './Circle'
+import ColorInput from './ColorInput';
 
 interface PaletteProps {
-  base: ColorRGB;
-  color1: ColorRGB;
   n: number;
 }
 
@@ -24,11 +23,11 @@ const drawHLC = false;
 class Palette extends React.Component<PaletteProps, PaletteState> {
   constructor(props: PaletteProps) {
     super(props);
-    this.state = { colors: [RGB_to_LAB(props.base), RGB_to_LAB(props.color1)] }
-    for (let i = 1; i < props.n; i++) {
+    this.state = { colors: [] }
+    for (let i = 0; i < props.n; i++) {
       this.state.colors.push({
         // L: randomInt(0, 100),
-        L: RGB_to_LAB(props.color1).L,
+        L: 50,
         a: randomInt(-128, 127),
         b: randomInt(-128, 127)
       });
@@ -58,53 +57,58 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   }
 
   render(): JSX.Element {
-    let id = 0;
-    const items_circles = this.state.colors.map((color: ColorLAB) => {
+    let id: number = 0;
+    const circles = this.state.colors.map((color: ColorLAB) => {
       const css_color: string = LAB_to_CSS(color);
-      return (<Circle key={id++}
-        x={this.x(color)} y={this.y(color)}
-        r={this.r(color)} color={css_color} />);
+      return (<Circle key={'cirlce_' + id++} x={this.x(color)} y={this.y(color)} 
+              r={this.r(color)} color={css_color} />);
     });
 
-    let color_pairs: Array<Array<ColorLAB>> = [];
-    for (let color1 of this.state.colors) {
-      for (let color2 of this.state.colors) {
-        color_pairs.push([color1, color2]);
-      }
-    }
+    // let color_pairs: Array<Array<ColorLAB>> = [];
+    // for (let color1 of this.state.colors) {
+    //   for (let color2 of this.state.colors) {
+    //     color_pairs.push([color1, color2]);
+    //   }
+    // }
 
-    const items_pairs = color_pairs.map((colors: Array<ColorLAB>) => {
-      const css_color1: string = LAB_to_CSS(colors[0]);
-      const css_color2: string = LAB_to_CSS(colors[1]);
-      return (
-        <div key={id++} style={{
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          backgroundColor: css_color1, color: css_color2
-        }}>
-          {CIEDE2000(colors[0], colors[1]).toFixed(2)}
-        </div>
-      );
+    // const items_pairs = color_pairs.map((colors: Array<ColorLAB>) => {
+    //   const css_color1: string = LAB_to_CSS(colors[0]);
+    //   const css_color2: string = LAB_to_CSS(colors[1]);
+    //   return (
+    //     <div key={id++} style={{
+    //       display: 'flex', justifyContent: 'center', alignItems: 'center',
+    //       backgroundColor: css_color1, color: css_color2
+    //     }}>
+    //       {CIEDE2000(colors[0], colors[1]).toFixed(2)}
+    //     </div>
+    //   );
+    // });
+
+    // const repeat: string = 'repeat(' + this.state.colors.length + ', 70px)';
+    id = 0;
+    const inputs = this.state.colors.map(() => {
+      const handler = (colors: Array<ColorLAB>) => {
+        this.setState({colors: colors});
+      };
+      return (<ColorInput key={'input_' + id} colors={this.state.colors} id={id++} handler={handler}/>);
     });
 
-    const repeat: string = 'repeat(' + this.state.colors.length + ', 70px)';
     return (
       <div style={{ display: 'flex' }}>
+        <div>
+          {inputs}
+        </div>
         <div className="Canvas" style={{
           position: 'relative', border: '1px solid', width: w + 'px', height: h + 'px'
         }}>
-          {items_circles}
+          {circles}
         </div>
-        <div style={{
-          display: 'grid', gridTemplateColumns: repeat, gridTemplateRows: repeat,
-          gridGap: '2px', margin: '10px'
-        }}>
-          {items_pairs}
-        </div>
+
       </div>
     );
   }
+  
 }
-
 
 // min and max are inclusive
 function randomInt(min: number, max: number): number {
