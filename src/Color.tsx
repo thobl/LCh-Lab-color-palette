@@ -3,7 +3,7 @@
 // definition of color types
 
 export interface Color {
-    [Key: string]: number;
+  [Key: string]: number;
 }
 
 export interface ColorHLC extends Color {
@@ -174,12 +174,12 @@ export function Hex_to_RGB(color: string): ColorRGB {
   return { R: NaN, G: NaN, B: NaN };
 }
 
-export function LAB_to_Hex(color: ColorLAB): string {
-  return RGB_to_Hex(LAB_to_RGB(color));
+export function HLC_to_Hex(color: ColorHLC): string {
+  return RGB_to_Hex(HLC_to_RGB(color));
 }
 
-export function Hex_to_LAB(color: string): ColorLAB {
-  return RGB_to_LAB(Hex_to_RGB(color));
+export function Hex_to_HLC(color: string): ColorHLC {
+  return RGB_to_HLC(Hex_to_RGB(color));
 }
 
 export function RGB_to_CSS(color: ColorRGB): string {

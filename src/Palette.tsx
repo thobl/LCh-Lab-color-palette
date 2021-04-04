@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorHLC, ColorLAB, HLC_to_LAB, LAB_to_CSS, LAB_to_HLC } from './Color'
+import { ColorHLC, ColorLAB, HLC_to_CSS, HLC_to_LAB, LAB_to_CSS, LAB_to_HLC } from './Color'
 import Circle from './Circle'
 import ColorInput from './ColorInput';
 
@@ -7,10 +7,13 @@ interface PaletteProps {
 }
 
 interface PaletteState {
-  colors: Array<ColorLAB>;
+  colors: Array<ColorHLC>;
   drawHLC: boolean;
   n_base: number;
   n: number;
+  offset: number;
+  L: number;
+  C: number;
 }
 
 // dimensions of the canvas
@@ -23,60 +26,60 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   constructor(props: PaletteProps) {
     super(props);
     this.state = {
-      colors: [{ L: 100, a: 0, b: 0 }, { L: 30, a: 0, b: 0 }],
+      colors: [{ H: 0, L: 100, C: 0 }, { H: 0, L: 30, C: 0 }],
       drawHLC: false,
       n_base: 2,
-      n: 8
+      n: 8,
+      offset: 0.8,
+      L: 50,
+      C: 90
     };
     const n: number = this.state.n;
     for (let i = 0; i < n; i++) {
-      const hlc: ColorHLC = {
-        H: -180 + (i + 0.8) * 360 / n,
-        L: 50,
-        C: 90
-      }
-      this.state.colors.push(
-        HLC_to_LAB(hlc)
-      );
+      this.state.colors.push({
+        H: -180 + (i + this.state.offset) * 360 / n,
+        L: this.state.L,
+        C: this.state.C
+      });
     }
   }
 
-  private x(color: ColorLAB): number {
+  private x(color: ColorHLC): number {
     if (this.state.drawHLC) {
-      const H: number = LAB_to_HLC(color).H;
+      const H: number = color.H;
       return (H + 180) / 360 * (w - 2 * r) + r;
     }
-    return (color.a + 128) / 255 * (w - 2 * r) + r;
+    return (HLC_to_LAB(color).a + 128) / 255 * (w - 2 * r) + r;
   }
 
-  private y(color: ColorLAB): number {
+  private y(color: ColorHLC): number {
     if (this.state.drawHLC) {
-      const C: number = LAB_to_HLC(color).C;
+      const C: number = color.C;
       return C / 181 * (h - 2 * r) + r;
     }
 
-    return (color.b + 128) / 255 * (h - 2 * r) + r;
+    return (HLC_to_LAB(color).b + 128) / 255 * (h - 2 * r) + r;
   }
 
-  private r(color: ColorLAB): number {
+  private r(color: ColorHLC): number {
     const min: number = 10;
     return color.L / 100 * (r - min) + min;
   }
 
   render(): JSX.Element {
     let id: number = 0;
-    const circles = this.state.colors.map((color: ColorLAB) => {
-      const css_color: string = LAB_to_CSS(color);
-      return (<Circle key={'cirlce_' + id++} x={this.x(color)} y={this.y(color)}
+    const circles = this.state.colors.map((color: ColorHLC): JSX.Element => {
+      const css_color: string = HLC_to_CSS(color);
+      return (<Circle key={`circle_${id++}`} x={this.x(color)} y={this.y(color)}
         r={this.r(color)} color={css_color} />);
     });
 
     id = 0;
     const inputs = this.state.colors.map(() => {
-      const handler = (colors: Array<ColorLAB>) => {
+      const handler = (colors: Array<ColorHLC>) => {
         this.setState({ colors: colors });
       };
-      return (<ColorInput key={'input_' + id} colors={this.state.colors} id={id++} handler={handler} />);
+      return (<ColorInput key={`input_${id}`} colors={this.state.colors} id={id++} handler={handler} />);
     });
 
     return (
