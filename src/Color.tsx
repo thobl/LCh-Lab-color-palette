@@ -2,25 +2,29 @@
 //////////////////////////////////////////////////////////////////////
 // definition of color types
 
-export interface ColorHLC {
+export interface Color {
+    [Key: string]: number;
+}
+
+export interface ColorHLC extends Color {
   H: number;
   L: number;
   C: number;
 }
 
-export interface ColorLAB {
+export interface ColorLAB extends Color {
   L: number;
   a: number;
   b: number;
 }
 
-export interface ColorXYZ {
+export interface ColorXYZ extends Color {
   X: number;
   Y: number;
   Z: number;
 }
 
-export interface ColorRGB {
+export interface ColorRGB extends Color {
   R: number;
   G: number;
   B: number;

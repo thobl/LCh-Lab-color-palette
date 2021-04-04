@@ -18,7 +18,7 @@ const h: number = 600;
 const r: number = 30;
 
 // drawing mode
-const drawHLC = true;
+const drawHLC = false;
 
 class Palette extends React.Component<PaletteProps, PaletteState> {
   constructor(props: PaletteProps) {
