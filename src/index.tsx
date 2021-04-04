@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Palette from './Palette';
 import './Palette.css'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Palette />
   </React.StrictMode>,
   document.getElementById('root')
 );

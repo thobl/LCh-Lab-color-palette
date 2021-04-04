@@ -4,11 +4,13 @@ import Circle from './Circle'
 import ColorInput from './ColorInput';
 
 interface PaletteProps {
-  n: number;
 }
 
 interface PaletteState {
-  colors: Array<ColorLAB>
+  colors: Array<ColorLAB>;
+  drawHLC: boolean;
+  n_base: number;
+  n: number;
 }
 
 // dimensions of the canvas
@@ -17,34 +19,30 @@ const h: number = 600;
 // max radius of a disk
 const r: number = 30;
 
-// drawing mode
-const drawHLC = false;
-
 class Palette extends React.Component<PaletteProps, PaletteState> {
   constructor(props: PaletteProps) {
     super(props);
-    this.state = { colors: [{L: 100, a: 0, b: 0}, {L: 30, a: 0, b: 0}] }
-    const n: number = props.n - 2;
+    this.state = {
+      colors: [{ L: 100, a: 0, b: 0 }, { L: 30, a: 0, b: 0 }],
+      drawHLC: false,
+      n_base: 2,
+      n: 8
+    };
+    const n: number = this.state.n;
     for (let i = 0; i < n; i++) {
       const hlc: ColorHLC = {
-        H: -180 + (i + 0.8) * 360/n,
+        H: -180 + (i + 0.8) * 360 / n,
         L: 50,
         C: 90
       }
       this.state.colors.push(
         HLC_to_LAB(hlc)
-// {
-      //   // L: randomInt(0, 100),
-      //   L: 50,
-      //   a: randomInt(-128, 127),
-      //   b: randomInt(-128, 127)
-      // }
       );
     }
   }
 
   private x(color: ColorLAB): number {
-    if (drawHLC) {
+    if (this.state.drawHLC) {
       const H: number = LAB_to_HLC(color).H;
       return (H + 180) / 360 * (w - 2 * r) + r;
     }
@@ -52,7 +50,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   }
 
   private y(color: ColorLAB): number {
-    if (drawHLC) {
+    if (this.state.drawHLC) {
       const C: number = LAB_to_HLC(color).C;
       return C / 181 * (h - 2 * r) + r;
     }
@@ -69,33 +67,34 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     let id: number = 0;
     const circles = this.state.colors.map((color: ColorLAB) => {
       const css_color: string = LAB_to_CSS(color);
-      return (<Circle key={'cirlce_' + id++} x={this.x(color)} y={this.y(color)} 
-              r={this.r(color)} color={css_color} />);
+      return (<Circle key={'cirlce_' + id++} x={this.x(color)} y={this.y(color)}
+        r={this.r(color)} color={css_color} />);
     });
 
     id = 0;
     const inputs = this.state.colors.map(() => {
       const handler = (colors: Array<ColorLAB>) => {
-        this.setState({colors: colors});
+        this.setState({ colors: colors });
       };
-      return (<ColorInput key={'input_' + id} colors={this.state.colors} id={id++} handler={handler}/>);
+      return (<ColorInput key={'input_' + id} colors={this.state.colors} id={id++} handler={handler} />);
     });
 
     return (
       <div style={{ display: 'flex' }}>
         <div>
+          <div className="CircleBox" style={{ width: w + 'px', height: h + 'px' }}>
+            {circles}
+          </div>
+          <input name='drawHLC' type='checkbox' checked={this.state.drawHLC} onChange={(e) => this.setState({ ['drawHLC']: e.target.checked })} />
+          <label htmlFor='drawHLC'>draw as HLC (LAB otherwise)</label>
+        </div>
+        <div>
           {inputs}
         </div>
-        <div className="Canvas" style={{
-          position: 'relative', border: '1px solid', width: w + 'px', height: h + 'px'
-        }}>
-          {circles}
-        </div>
-
       </div>
     );
   }
-  
+
 }
 
 // min and max are inclusive
