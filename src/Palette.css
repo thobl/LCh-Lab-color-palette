@@ -1,0 +1,28 @@
+
+.LABInput {
+    width: 30px;
+    text-align: right;
+}
+.ColorInputPreviewBox {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    padding: 5px;
+}
+
+.ColorInputPreviewRow {
+    display: grid;
+    grid-gap: 2px;
+    grid-auto-flow: column;
+}
+
+.Spacer {
+    margin-left: 10px;
+}
+
+.ColorInput {
+    margin-bottom: 5px;
+    margin-right: 5px;
+    border: 1px solid;
+    padding: 2px;
+}
