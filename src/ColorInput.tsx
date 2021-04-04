@@ -1,5 +1,5 @@
 import React from 'react'
-import { CIEDE2000, ColorLAB, ColorRGB, ColorXYZ, Hex_to_LAB, LAB_to_CSS, LAB_to_Hex, LAB_to_RGB, LAB_to_XYZ } from './Color';
+import { CIEDE2000, ColorLAB, ColorRGB, ColorXYZ, Hex_to_LAB, HLC_to_LAB, LAB_to_CSS, LAB_to_Hex, LAB_to_HLC, LAB_to_RGB, LAB_to_XYZ } from './Color';
 
 interface ColorInputProps {
   colors: Array<ColorLAB>;
@@ -13,15 +13,26 @@ export default class ColorInput extends React.Component<ColorInputProps> {
     // make shallow copies of the color array and of our color
     const colors: Array<ColorLAB> = [...this.props.colors];
     const color: ColorLAB = { ...colors[id] };
+    const hlc = LAB_to_HLC(color);
 
     // change function for L, a, and b
-    const onChangeFunction = (prop: 'L' | 'a' | 'b') => {
+    const onChangeFunctionLAB = (prop: 'L' | 'a' | 'b') => {
       return (e: React.ChangeEvent<HTMLInputElement>) => {
         color[prop] = parseFloat(e.target.value);
         colors[id] = color;
         this.props.handler(colors);
       }
     }
+    
+    // change function for HLC
+    const onChangeFunctionHLC = (prop: 'H' | 'L' | 'C') => {
+      return (e: React.ChangeEvent<HTMLInputElement>) => {
+        hlc[prop] = parseFloat(e.target.value);
+        colors[id] = HLC_to_LAB(hlc);
+        this.props.handler(colors);
+      }
+    }
+
 
     const onChangeHex = (e: React.ChangeEvent<HTMLInputElement>) => {
       colors[id] = Hex_to_LAB(e.target.value);
@@ -48,14 +59,24 @@ export default class ColorInput extends React.Component<ColorInputProps> {
           {preview_boxes}
         </div>
         <div className='ColorInputControls'>
-          <input className='LABslider' type='range' min='0' max='100' value={color.L} onChange={onChangeFunction('L')} />
-          <input className='LABInput' value={color.L} onChange={onChangeFunction('L')} />
+          <input className='LABslider' type='range' min='0' max='100' value={color.L} onChange={onChangeFunctionLAB('L')} />
+          <input className='LABInput' value={color.L} onChange={onChangeFunctionLAB('L')} />
           <span className='Spacer'> </span>
-          <input className='LABslider' type='range' min='-128' max='127' value={color.a} onChange={onChangeFunction('a')} />
-          <input className='LABInput' value={color.a} onChange={onChangeFunction('a')} />
+          <input className='LABslider' type='range' min='-128' max='127' value={color.a} onChange={onChangeFunctionLAB('a')} />
+          <input className='LABInput' value={color.a} onChange={onChangeFunctionLAB('a')} />
           <span className='Spacer'> </span>
-          <input className='LABslider' type='range' min='-128' max='127' value={color.b} onChange={onChangeFunction('b')} />
-          <input className='LABInput' value={color.b} onChange={onChangeFunction('b')} />
+          <input className='LABslider' type='range' min='-128' max='127' value={color.b} onChange={onChangeFunctionLAB('b')} />
+          <input className='LABInput' value={color.b} onChange={onChangeFunctionLAB('b')} />
+        </div>
+        <div className='ColorInputControls'>
+          <input className='LABslider' type='range' min='0' max='100' value={hlc.L} onChange={onChangeFunctionHLC('L')} />
+          <input className='LABInput' value={hlc.L} onChange={onChangeFunctionHLC('L')} />
+          <span className='Spacer'> </span>
+          <input className='LABslider' type='range' min='-180' max='180' value={hlc.H} onChange={onChangeFunctionHLC('H')} />
+          <input className='LABInput' value={hlc.H} onChange={onChangeFunctionHLC('H')} />
+          <span className='Spacer'> </span>
+          <input className='LABslider' type='range' min='0' max='181' value={hlc.C} onChange={onChangeFunctionHLC('C')} />
+          <input className='LABInput' value={hlc.C} onChange={onChangeFunctionHLC('C')} />
         </div>
         <input className='HexInput' value={LAB_to_Hex(color)} onChange={onChangeHex} />
         <span className='Spacer'> </span>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorLAB, LAB_to_CSS, LAB_to_HLC } from './Color'
+import { ColorHLC, ColorLAB, HLC_to_LAB, LAB_to_CSS, LAB_to_HLC } from './Color'
 import Circle from './Circle'
 import ColorInput from './ColorInput';
 
@@ -18,19 +18,28 @@ const h: number = 600;
 const r: number = 30;
 
 // drawing mode
-const drawHLC = false;
+const drawHLC = true;
 
 class Palette extends React.Component<PaletteProps, PaletteState> {
   constructor(props: PaletteProps) {
     super(props);
-    this.state = { colors: [] }
-    for (let i = 0; i < props.n; i++) {
-      this.state.colors.push({
-        // L: randomInt(0, 100),
+    this.state = { colors: [{L: 100, a: 0, b: 0}, {L: 30, a: 0, b: 0}] }
+    const n: number = props.n - 2;
+    for (let i = 0; i < n; i++) {
+      const hlc: ColorHLC = {
+        H: -180 + (i + 0.8) * 360/n,
         L: 50,
-        a: randomInt(-128, 127),
-        b: randomInt(-128, 127)
-      });
+        C: 90
+      }
+      this.state.colors.push(
+        HLC_to_LAB(hlc)
+// {
+      //   // L: randomInt(0, 100),
+      //   L: 50,
+      //   a: randomInt(-128, 127),
+      //   b: randomInt(-128, 127)
+      // }
+      );
     }
   }
 
@@ -64,27 +73,6 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
               r={this.r(color)} color={css_color} />);
     });
 
-    // let color_pairs: Array<Array<ColorLAB>> = [];
-    // for (let color1 of this.state.colors) {
-    //   for (let color2 of this.state.colors) {
-    //     color_pairs.push([color1, color2]);
-    //   }
-    // }
-
-    // const items_pairs = color_pairs.map((colors: Array<ColorLAB>) => {
-    //   const css_color1: string = LAB_to_CSS(colors[0]);
-    //   const css_color2: string = LAB_to_CSS(colors[1]);
-    //   return (
-    //     <div key={id++} style={{
-    //       display: 'flex', justifyContent: 'center', alignItems: 'center',
-    //       backgroundColor: css_color1, color: css_color2
-    //     }}>
-    //       {CIEDE2000(colors[0], colors[1]).toFixed(2)}
-    //     </div>
-    //   );
-    // });
-
-    // const repeat: string = 'repeat(' + this.state.colors.length + ', 70px)';
     id = 0;
     const inputs = this.state.colors.map(() => {
       const handler = (colors: Array<ColorLAB>) => {
