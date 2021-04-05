@@ -131,12 +131,6 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
             number of colors
           </div>
           <div className='row'>
-            <input className='Slider' type='range' min='0' max='100' value={100 * this.state.offset}
-              onChange={(e) => this.setState({ ['offset']: parseFloat(e.target.value) / 100 })} />
-            <span className='Spacer'> </span>
-            H-offset (hue)
-          </div>
-          <div className='row'>
             <input className='Slider' type='range' min='0' max='100' value={this.state.L}
               onChange={(e) => this.setState({ ['L']: parseFloat(e.target.value) })} />
             <span className='Spacer'> </span>
@@ -147,6 +141,12 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
               onChange={(e) => this.setState({ ['C']: parseFloat(e.target.value) })} />
             <span className='Spacer'> </span>
            C (chroma)
+          </div>
+          <div className='row'>
+            <input className='Slider' type='range' min='0' max='100' value={100 * this.state.offset}
+              onChange={(e) => this.setState({ ['offset']: parseFloat(e.target.value) / 100 })} />
+            <span className='Spacer'> </span>
+            h-offset (hue)
           </div>
         </div>
         <div>

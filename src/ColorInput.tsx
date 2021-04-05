@@ -64,22 +64,28 @@ export default class ColorInput extends React.Component<ColorInputProps> {
     return (
       <div className='ColorInput'>
         <div className='ColorInputControls'>
+        <span className='label'>L:</span>
           {input('L', 'sld', 0, 100, identity, identity)}
           {input('L', 'txt', 0, 100, identity, identity)}
-          <span className='Spacer'> </span>
-          {input('h', 'sld', -180, 180, identity, identity)}
-          {input('h', 'txt', -180, 180, identity, identity)}
-          <span className='Spacer'> </span>
+          <span className='Spacer'></span>
+        <span className='label'>C:</span>
           {input('C', 'sld', 0, 180, identity, identity)}
           {input('C', 'txt', 0, 180, identity, identity)}
+          <span className='Spacer'></span>
+        <span className='label'>h:</span>
+          {input('h', 'sld', -180, 180, identity, identity)}
+          {input('h', 'txt', -180, 180, identity, identity)}
         </div>
         <div className='ColorInputControls'>
+        <span className='label'>L:</span>
           {input('L', 'sld', 0, 100, LCh_to_Lab, Lab_to_LCh)}
           {input('L', 'txt', 0, 100, LCh_to_Lab, Lab_to_LCh)}
-          <span className='Spacer'> </span>
+          <span className='Spacer'></span>
+        <span className='label'>a:</span>
           {input('a', 'sld', -128, 127, LCh_to_Lab, Lab_to_LCh)}
           {input('a', 'txt', -128, 127, LCh_to_Lab, Lab_to_LCh)}
-          <span className='Spacer'> </span>
+          <span className='Spacer'></span>
+        <span className='label'>b:</span>
           {input('b', 'sld', -128, 127, LCh_to_Lab, Lab_to_LCh)}
           {input('b', 'txt', -128, 127, LCh_to_Lab, Lab_to_LCh)}
         </div>
