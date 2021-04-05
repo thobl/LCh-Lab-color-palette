@@ -6,13 +6,13 @@ export interface Color {
   [Key: string]: number;
 }
 
-export interface ColorHLC extends Color {
-  H: number;
+export interface ColorLCh extends Color {
   L: number;
   C: number;
+  h: number;
 }
 
-export interface ColorLAB extends Color {
+export interface ColorLab extends Color {
   L: number;
   a: number;
   b: number;
@@ -34,18 +34,18 @@ export interface ColorRGB extends Color {
 // conversion between color types
 
 // en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model
-export function HLC_to_LAB(color: ColorHLC): ColorLAB {
+export function HLC_to_LAB(color: ColorLCh): ColorLab {
   return {
     L: color.L,
-    a: color.C * Math.cos(rad(color.H)),
-    b: color.C * Math.sin(rad(color.H)),
+    a: color.C * Math.cos(rad(color.h)),
+    b: color.C * Math.sin(rad(color.h)),
   };
 }
 
 // en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model
-export function LAB_to_HLC(color: ColorLAB): ColorHLC {
+export function LAB_to_HLC(color: ColorLab): ColorLCh {
   return {
-    H: deg(Math.atan2(color.b, color.a)),
+    h: deg(Math.atan2(color.b, color.a)),
     L: color.L,
     C: Math.sqrt(color.a ** 2 + color.b ** 2)
   };
@@ -57,7 +57,7 @@ export function LAB_to_HLC(color: ColorLAB): ColorHLC {
 const ref_white: ColorXYZ = { X: 95.0489, Y: 100, Z: 108.8840 }
 
 // https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ
-export function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
+export function LAB_to_XYZ(color: ColorLab): ColorXYZ {
   const { L, a, b } = color;
 
   const f_ = (t: number): number => {
@@ -74,7 +74,7 @@ export function LAB_to_XYZ(color: ColorLAB): ColorXYZ {
 }
 
 // https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB[11]
-export function XYZ_to_LAB(color: ColorXYZ): ColorLAB {
+export function XYZ_to_LAB(color: ColorXYZ): ColorLab {
   const { X, Y, Z } = color;
 
   const f = (t: number): number => {
@@ -131,27 +131,27 @@ export function RGB_to_XYZ(color: ColorRGB): ColorXYZ {
   };
 }
 
-export function XYZ_to_HLC(color: ColorXYZ): ColorHLC {
+export function XYZ_to_HLC(color: ColorXYZ): ColorLCh {
   return LAB_to_HLC(XYZ_to_LAB(color));
 }
 
-export function HLC_to_XYZ(color: ColorHLC): ColorXYZ {
+export function HLC_to_XYZ(color: ColorLCh): ColorXYZ {
   return LAB_to_XYZ(HLC_to_LAB(color));
 }
 
-export function RGB_to_LAB(color: ColorRGB): ColorLAB {
+export function RGB_to_LAB(color: ColorRGB): ColorLab {
   return XYZ_to_LAB(RGB_to_XYZ(color));
 }
 
-export function LAB_to_RGB(color: ColorLAB): ColorRGB {
+export function LAB_to_RGB(color: ColorLab): ColorRGB {
   return XYZ_to_RGB(LAB_to_XYZ(color));
 }
 
-export function RGB_to_HLC(color: ColorRGB): ColorHLC {
+export function RGB_to_HLC(color: ColorRGB): ColorLCh {
   return XYZ_to_HLC(RGB_to_XYZ(color));
 }
 
-export function HLC_to_RGB(color: ColorHLC): ColorRGB {
+export function HLC_to_RGB(color: ColorLCh): ColorRGB {
   return XYZ_to_RGB(HLC_to_XYZ(color));
 }
 
@@ -174,11 +174,11 @@ export function Hex_to_RGB(color: string): ColorRGB {
   return { R: NaN, G: NaN, B: NaN };
 }
 
-export function HLC_to_Hex(color: ColorHLC): string {
+export function HLC_to_Hex(color: ColorLCh): string {
   return RGB_to_Hex(HLC_to_RGB(color));
 }
 
-export function Hex_to_HLC(color: string): ColorHLC {
+export function Hex_to_HLC(color: string): ColorLCh {
   return RGB_to_HLC(Hex_to_RGB(color));
 }
 
@@ -190,11 +190,11 @@ export function XYZ_to_CSS(color: ColorXYZ): string {
   return RGB_to_CSS(XYZ_to_RGB(color));
 }
 
-export function LAB_to_CSS(color: ColorLAB): string {
+export function LAB_to_CSS(color: ColorLab): string {
   return RGB_to_CSS(LAB_to_RGB(color));
 }
 
-export function HLC_to_CSS(color: ColorHLC): string {
+export function HLC_to_CSS(color: ColorLCh): string {
   return RGB_to_CSS(HLC_to_RGB(color));
 }
 
@@ -205,7 +205,7 @@ export function HLC_to_CSS(color: ColorHLC): string {
 //
 // Numbers are according to the equation labels in that document.
 
-export function CIEDE2000(color1: ColorLAB, color2: ColorLAB): number {
+export function CIEDE2000(color1: ColorLab, color2: ColorLab): number {
   let { L: L1, a: a1, b: b1 } = color1;
   let { L: L2, a: a2, b: b2 } = color2;
 
@@ -319,9 +319,9 @@ export function check_conversion() {
   // const rgb1: ColorRGB = {R: Math.random(), G: Math.random(), B: Math.random()};
   const rgb1: ColorRGB = { R: 100 / 255, G: 241 / 255, B: 2 / 255 };
   const xyz1: ColorXYZ = RGB_to_XYZ(rgb1);
-  const lab1: ColorLAB = XYZ_to_LAB(xyz1);
-  const hlc: ColorHLC = LAB_to_HLC(lab1);
-  const lab2: ColorLAB = HLC_to_LAB(hlc);
+  const lab1: ColorLab = XYZ_to_LAB(xyz1);
+  const hlc: ColorLCh = LAB_to_HLC(lab1);
+  const lab2: ColorLab = HLC_to_LAB(hlc);
   const xyz2: ColorXYZ = LAB_to_XYZ(lab2);
   const rgb2: ColorRGB = XYZ_to_RGB(xyz2);
   console.log("rgb", rgb1);

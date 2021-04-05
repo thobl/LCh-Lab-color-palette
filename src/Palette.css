@@ -1,18 +1,18 @@
-
-.ParamInput {
-    width: 60px;
+/* general text input and sliders */
+input[type=text] {
+    width: 40px;
     text-align: right;
     padding: 2px;
     border: 1px solid;
 }
 
-.Slider {
+input[type=range] {
     appearance: none;
     height: 1px;
     background: black;
 }
 
-.Slider::-webkit-slider-thumb {
+input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 12px;
@@ -23,13 +23,23 @@
   cursor: pointer;
 }
 
-.Slider::-moz-range-thumb {
+input[type=range]::-moz-range-thumb {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   border: 1px solid black;
   background: white;
   cursor: pointer;
+}
+
+input.hexInput {
+    width: 60px;
+    text-align: center;
+}
+
+input.nInput {
+    width: 20px;
+    text-align: center;
 }
 
 .ColorInputControls {
@@ -63,4 +73,9 @@
 .CircleBox {
     position: relative;
     border: 1px solid;
+}
+
+.row {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
