@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorLCh, LCh_to_CSS, LCh_to_Lab } from './Color'
+import { ColorLCh, LCh_to_CSS, LCh_to_Hex, LCh_to_Lab } from './Color'
 import Circle from './Circle'
 import ColorInput from './ColorInput';
 
@@ -107,6 +107,10 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       return (<ColorInput key={`input_${id}`} colors={this.state.colors} id={id++} handler={handler} />);
     });
 
+    const hexOutput = this.state.colors.map((color: ColorLCh):JSX.Element => {
+      return(<div>{LCh_to_Hex(color)}</div>);
+    });
+
     return (
       <div style={{ display: 'flex' }}>
         <div>
@@ -148,6 +152,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
             <span className='Spacer'> </span>
             h-offset (hue)
           </div>
+        {hexOutput}
         </div>
         <div>
           {inputs}
