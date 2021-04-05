@@ -1,5 +1,5 @@
 import React from 'react'
-import { CIEDE2000, ColorLCh, Hex_to_HLC, HLC_to_LAB, HLC_to_Hex, LAB_to_HLC, HLC_to_CSS, Color } from './Color';
+import { CIEDE2000, ColorLCh, Hex_to_LCh, LCh_to_Lab, LCh_to_Hex, Lab_to_LCh, LCh_to_CSS, Color } from './Color';
 
 interface ColorInputProps {
   colors: Array<ColorLCh>;
@@ -19,18 +19,18 @@ export default class ColorInput extends React.Component<ColorInputProps> {
       prop: keyof T,
       inputType: 'txt' | 'sld',
       min: number, max: number,
-      convFromHLC: (color: ColorLCh) => T,
-      convToHLC: (col: T) => ColorLCh) => {
+      convFromLCh: (color: ColorLCh) => T,
+      convToLCh: (col: T) => ColorLCh) => {
 
       // color in the desired format
-      let col: T = convFromHLC(color);
+      let col: T = convFromLCh(color);
 
       // change handler
       const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let change: any = {};
         change[prop] = Math.min(max, Math.max(min, parseFloat(e.target.value)));
         const col_new = { ...col, ...change };
-        colors[id] = convToHLC(col_new);
+        colors[id] = convToLCh(col_new);
         this.props.handler(colors);
       }
 
@@ -44,19 +44,19 @@ export default class ColorInput extends React.Component<ColorInputProps> {
     const identity = <T extends unknown>(inp: T): T => inp;
 
     const onChangeHex = (e: React.ChangeEvent<HTMLInputElement>) => {
-      colors[id] = Hex_to_HLC(e.target.value);
+      colors[id] = Hex_to_LCh(e.target.value);
       this.props.handler(colors);
     }
 
-    const hexInput = <input className='hexInput' type='text' value={HLC_to_Hex(color)} onChange={onChangeHex} />
+    const hexInput = <input className='hexInput' type='text' value={LCh_to_Hex(color)} onChange={onChangeHex} />
 
     let id2: number = 0;
     const preview_boxes = colors.map((color2: ColorLCh) => {
-      const css_color1: string = HLC_to_CSS(color);
-      const css_color2: string = HLC_to_CSS(color2);
+      const css_color1: string = LCh_to_CSS(color);
+      const css_color2: string = LCh_to_CSS(color2);
       return (
         <div className='ColorInputPreviewBox' key={id2++} style={{ backgroundColor: css_color1, color: css_color2 }}>
-          {CIEDE2000(HLC_to_LAB(color), HLC_to_LAB(color2)).toFixed(2)}
+          {CIEDE2000(LCh_to_Lab(color), LCh_to_Lab(color2)).toFixed(2)}
         </div>
       );
     });
@@ -74,14 +74,14 @@ export default class ColorInput extends React.Component<ColorInputProps> {
           {input('C', 'txt', 0, 180, identity, identity)}
         </div>
         <div className='ColorInputControls'>
-          {input('L', 'sld', 0, 100, HLC_to_LAB, LAB_to_HLC)}
-          {input('L', 'txt', 0, 100, HLC_to_LAB, LAB_to_HLC)}
+          {input('L', 'sld', 0, 100, LCh_to_Lab, Lab_to_LCh)}
+          {input('L', 'txt', 0, 100, LCh_to_Lab, Lab_to_LCh)}
           <span className='Spacer'> </span>
-          {input('a', 'sld', -128, 127, HLC_to_LAB, LAB_to_HLC)}
-          {input('a', 'txt', -128, 127, HLC_to_LAB, LAB_to_HLC)}
+          {input('a', 'sld', -128, 127, LCh_to_Lab, Lab_to_LCh)}
+          {input('a', 'txt', -128, 127, LCh_to_Lab, Lab_to_LCh)}
           <span className='Spacer'> </span>
-          {input('b', 'sld', -128, 127, HLC_to_LAB, LAB_to_HLC)}
-          {input('b', 'txt', -128, 127, HLC_to_LAB, LAB_to_HLC)}
+          {input('b', 'sld', -128, 127, LCh_to_Lab, Lab_to_LCh)}
+          {input('b', 'txt', -128, 127, LCh_to_Lab, Lab_to_LCh)}
         </div>
         <div className='ColorInputPreviewRow' >
           {hexInput}

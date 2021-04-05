@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorLCh, HLC_to_CSS, HLC_to_LAB } from './Color'
+import { ColorLCh, LCh_to_CSS, LCh_to_Lab } from './Color'
 import Circle from './Circle'
 import ColorInput from './ColorInput';
 
@@ -8,7 +8,7 @@ interface PaletteProps {
 
 interface PaletteState {
   colors: Array<ColorLCh>;
-  drawHLC: boolean;
+  drawLCh: boolean;
   n_base: number;
   n: number;
   offset: number;
@@ -27,7 +27,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     super(props);
     this.state = {
       colors: [],
-      drawHLC: false,
+      drawLCh: false,
       n_base: 2,
       n: 8,
       offset: 0.8,
@@ -37,20 +37,20 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   }
 
   private x(color: ColorLCh): number {
-    if (this.state.drawHLC) {
+    if (this.state.drawLCh) {
       const H: number = color.h;
       return (H + 180) / 360 * (w - 2 * r) + r;
     }
-    return (HLC_to_LAB(color).a + 128) / 255 * (w - 2 * r) + r;
+    return (LCh_to_Lab(color).a + 128) / 255 * (w - 2 * r) + r;
   }
 
   private y(color: ColorLCh): number {
-    if (this.state.drawHLC) {
+    if (this.state.drawLCh) {
       const C: number = color.C;
       return C / 181 * (h - 2 * r) + r;
     }
 
-    return (HLC_to_LAB(color).b + 128) / 255 * (h - 2 * r) + r;
+    return (LCh_to_Lab(color).b + 128) / 255 * (h - 2 * r) + r;
   }
 
   private r(color: ColorLCh): number {
@@ -94,7 +94,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   render(): JSX.Element {
     let id: number = 0;
     const circles = this.state.colors.map((color: ColorLCh): JSX.Element => {
-      const css_color: string = HLC_to_CSS(color);
+      const css_color: string = LCh_to_CSS(color);
       return (<Circle key={`circle_${id++}`} x={this.x(color)} y={this.y(color)}
         r={this.r(color)} color={css_color} />);
     });
@@ -114,9 +114,9 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
             {circles}
           </div>
           <div className='row'>
-            <input type='checkbox' checked={this.state.drawHLC}
-              onChange={(e) => this.setState({ ['drawHLC']: e.target.checked })} />
-            <span className='Spacer'> </span> draw as HLC (LAB otherwise)
+            <input type='checkbox' checked={this.state.drawLCh}
+              onChange={(e) => this.setState({ ['drawLCh']: e.target.checked })} />
+            <span className='Spacer'> </span> draw as LCh (Lab otherwise)
           </div>
           <div className='row'>
             <input className='nInput' type='text' value={this.state.n_base}
