@@ -9,6 +9,7 @@ interface PaletteProps {
 interface PaletteState {
   colors: Array<ColorLCh>;
   drawLCh: boolean;
+  colorStroke: boolean;
   n_base: number;
   n: number;
   offset: number;
@@ -28,11 +29,12 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     this.state = {
       colors: [],
       drawLCh: false,
+      colorStroke: false,
       n_base: 2,
-      n: 8,
+      n: 6,
       offset: 0.8,
       L: 50,
-      C: 90
+      C: 60
     };
   }
 
@@ -96,7 +98,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     const circles = this.state.colors.map((color: ColorLCh): JSX.Element => {
       const css_color: string = LCh_to_CSS(color);
       return (<Circle key={`circle_${id++}`} x={this.x(color)} y={this.y(color)}
-        r={this.r(color)} color={css_color} />);
+              r={this.r(color)} color={css_color} colorStroke={this.state.colorStroke} />);
     });
 
     id = 0;
@@ -107,8 +109,8 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       return (<ColorInput key={`input_${id}`} colors={this.state.colors} id={id++} handler={handler} />);
     });
 
-    const hexOutput = this.state.colors.map((color: ColorLCh):JSX.Element => {
-      return(<div>{LCh_to_Hex(color)}</div>);
+    const hexOutput = this.state.colors.map((color: ColorLCh): JSX.Element => {
+      return (<div>{LCh_to_Hex(color)}</div>);
     });
 
     return (
@@ -121,6 +123,11 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
             <input type='checkbox' checked={this.state.drawLCh}
               onChange={(e) => this.setState({ ['drawLCh']: e.target.checked })} />
             <span className='Spacer'> </span> draw as LCh (Lab otherwise)
+          </div>
+          <div className='row'>
+            <input type='checkbox' checked={this.state.colorStroke}
+              onChange={(e) => this.setState({ ['colorStroke']: e.target.checked })} />
+        <span className='Spacer'> </span> color circle border (instead of interior)
           </div>
           <div className='row'>
             <input className='nInput' type='text' value={this.state.n_base}
@@ -152,7 +159,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
             <span className='Spacer'> </span>
             h-offset (hue)
           </div>
-        {hexOutput}
+          {hexOutput}
         </div>
         <div>
           {inputs}
