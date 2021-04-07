@@ -32,8 +32,10 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       colorStroke: false,
       n_base: 2,
       n: 6,
-      offset: 0.8,
-      L: 50,
+      // n_base: 10,
+      // n: 0,
+      offset: 0.33333,
+      L: 40,
       C: 60
     };
   }
@@ -67,19 +69,32 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   componentDidUpdate(prevProps: PaletteProps, prevState: PaletteState) {
     if (prevState.n !== this.state.n
       || prevState.n_base !== this.state.n_base
-      || prevState.offset !== this.state.offset
-      || prevState.L !== this.state.L
-      || prevState.C !== this.state.C) {
+      || prevState.offset !== this.state.offset) {
       this.initializeColors();
     }
+    if (prevState.L !== this.state.L) {
+      this.setColorPropertyAllExceptBase('L', this.state.L);
+    }
+    if (prevState.C !== this.state.C) {
+      this.setColorPropertyAllExceptBase('C', this.state.C);
+    }
+  }
+
+  private setColorPropertyAllExceptBase(prop: keyof ColorLCh, value: number) {
+    let colors: Array<ColorLCh> = [...this.state.colors];
+    for (let i = this.state.n_base; i < colors.length; i++) {
+      colors[i][prop] = value;
+    }
+    this.setState({ ['colors']: colors });
   }
 
   private initializeColors() {
     let colors: Array<ColorLCh> = [];
     const n_base = this.state.n_base;
+    const minL = 20;
     for (let i = n_base; i > 0; i--) {
       colors.push({
-        h: 0, L: 30 + (i - 1) * 70 / (n_base - 1), C: 0
+        h: -90, L: minL + (i - 1) * (100 - minL) / (n_base - 1), C: 7
       })
     }
     const n: number = this.state.n;
@@ -98,7 +113,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     const circles = this.state.colors.map((color: ColorLCh): JSX.Element => {
       const css_color: string = LCh_to_CSS(color);
       return (<Circle key={`circle_${id++}`} x={this.x(color)} y={this.y(color)}
-              r={this.r(color)} color={css_color} colorStroke={this.state.colorStroke} />);
+        r={this.r(color)} color={css_color} colorStroke={this.state.colorStroke} />);
     });
 
     id = 0;
@@ -127,7 +142,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
           <div className='row'>
             <input type='checkbox' checked={this.state.colorStroke}
               onChange={(e) => this.setState({ ['colorStroke']: e.target.checked })} />
-        <span className='Spacer'> </span> color circle border (instead of interior)
+            <span className='Spacer'> </span> color circle border (instead of interior)
           </div>
           <div className='row'>
             <input className='nInput' type='text' value={this.state.n_base}
