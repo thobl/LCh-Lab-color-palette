@@ -10,7 +10,12 @@ interface PaletteState {
   colors: Array<ColorLCh>;
   drawLCh: boolean;
   colorStroke: boolean;
-  n_base: number;
+  base_n: number;
+  base_L1: number;
+  base_L2: number;
+  base_C1: number;
+  base_C2: number;
+  base_h: number;
   n: number;
   offset: number;
   L: number;
@@ -30,10 +35,13 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       colors: [],
       drawLCh: false,
       colorStroke: false,
-      n_base: 2,
+      base_n: 3,
+      base_L1: 100,
+      base_L2: 0,
+      base_C1: 0,
+      base_C2: 0,
+      base_h: 0,
       n: 6,
-      // n_base: 10,
-      // n: 0,
       offset: 0.33333,
       L: 40,
       C: 60
@@ -68,7 +76,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
 
   componentDidUpdate(_prevProps: PaletteProps, prevState: PaletteState) {
     if (prevState.n !== this.state.n
-      || prevState.n_base !== this.state.n_base
+      || prevState.base_n !== this.state.base_n
       || prevState.offset !== this.state.offset) {
       this.initializeColors();
     }
@@ -82,7 +90,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
 
   private setColorPropertyAllExceptBase(prop: keyof ColorLCh, value: number) {
     let colors: Array<ColorLCh> = [...this.state.colors];
-    for (let i = this.state.n_base; i < colors.length; i++) {
+    for (let i = this.state.base_n; i < colors.length; i++) {
       colors[i][prop] = value;
     }
     this.setState({ 'colors': colors });
@@ -90,11 +98,11 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
 
   private initializeColors() {
     let colors: Array<ColorLCh> = [];
-    const n_base = this.state.n_base;
+    const base_n = this.state.base_n;
     const minL = 20;
-    for (let i = n_base; i > 0; i--) {
+    for (let i = base_n; i > 0; i--) {
       colors.push({
-        h: -90, L: minL + (i - 1) * (100 - minL) / (n_base - 1), C: 7
+        h: -90, L: minL + (i - 1) * (100 - minL) / (base_n - 1), C: 7
       })
     }
     const n: number = this.state.n;
@@ -109,24 +117,60 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   }
 
   render(): JSX.Element {
+    const colors = this.state.colors;
+
+    // drawing the circles
     let id: number = 0;
-    const circles = this.state.colors.map((color: ColorLCh): JSX.Element => {
+    const circles = colors.map((color: ColorLCh): JSX.Element => {
       const css_color: string = LCh_to_CSS(color);
       return (<Circle key={`circle_${id++}`} x={this.x(color)} y={this.y(color)}
         r={this.r(color)} color={css_color} colorStroke={this.state.colorStroke} />);
     });
 
+    // controls for the individual colors
     id = 0;
-    const inputs = this.state.colors.map(() => {
+    const inputs = colors.map(() => {
       const handler = (colors: Array<ColorLCh>) => {
-        this.setState({ colors: colors });
+        this.setState({ 'colors': colors });
       };
-      return (<ColorInput key={`input_${id}`} colors={this.state.colors} id={id++} handler={handler} />);
+      return (<ColorInput key={`input_${id}`} colors={colors} id={id++} handler={handler} />);
     });
+
+    // output as hex (for copying somewhere)
     id = 0;
-    const hexOutput = this.state.colors.map((color: ColorLCh): JSX.Element => {
+    const hexOutput = colors.map((color: ColorLCh): JSX.Element => {
       return (<div key={`hexoutput_${id++}`}>{LCh_to_Hex(color)}</div>);
     });
+
+    // function generating controls for global options
+    type numberKeys = Exclude<keyof PaletteState, 'colors' | 'drawLCh' | 'colorStroke'>;
+    const inputSlider = (prop: numberKeys, min: number, max: number, label: string, factor: number = 1) => (
+      <div className='row'>
+        <input className='Slider' type='range' min={min} max={max} value={factor * this.state[prop]}
+          onChange={(e) => this.setState({ ...this.state, [prop]: parseFloat(e.target.value) / factor })
+          } />
+        <span className='Spacer'> </span>
+        {label}
+      </div>
+    );
+    const inputNumber = (prop: numberKeys, label: string) => (
+      <div className='row'>
+        <input className='nInput' type='text' value={this.state[prop]}
+          onChange={(e) => this.setState({ ...this.state, [prop]: parseFloat(e.target.value) })
+          } />
+        <span className='Spacer'> </span>
+        {label}
+      </div>
+    );
+    const inputBool = (prop: 'drawLCh' | 'colorStroke', label: string) => (
+      <div className='row'>
+        <input type='checkbox' checked={this.state[prop]}
+          onChange={(e) => this.setState({ ...this.state, [prop]: e.target.checked })
+          } />
+        <span className='Spacer'> </span>
+        {label}
+      </div>
+    );
 
     return (
       <div style={{ display: 'flex' }}>
@@ -134,46 +178,13 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
           <div className='CircleBox' style={{ width: w + 'px', height: h + 'px' }}>
             {circles}
           </div>
-          <div className='row'>
-            <input type='checkbox' checked={this.state.drawLCh}
-              onChange={(e) => this.setState({ 'drawLCh': e.target.checked })} />
-            <span className='Spacer'> </span> draw as LCh (Lab otherwise)
-          </div>
-          <div className='row'>
-            <input type='checkbox' checked={this.state.colorStroke}
-              onChange={(e) => this.setState({ 'colorStroke': e.target.checked })} />
-            <span className='Spacer'> </span> color circle border (instead of interior)
-          </div>
-          <div className='row'>
-            <input className='nInput' type='text' value={this.state.n_base}
-              onChange={(e) => this.setState({ 'n_base': parseInt(e.target.value) })} />
-            <span className='Spacer'> </span>
-            number of base colors
-          </div>
-          <div className='row'>
-            <input className='nInput' type='text' value={this.state.n}
-              onChange={(e) => this.setState({ 'n': parseInt(e.target.value) })} />
-            <span className='Spacer'> </span>
-            number of colors
-          </div>
-          <div className='row'>
-            <input className='Slider' type='range' min='0' max='100' value={this.state.L}
-              onChange={(e) => this.setState({ 'L': parseFloat(e.target.value) })} />
-            <span className='Spacer'> </span>
-            L (lightness)
-          </div>
-          <div className='row'>
-            <input className='Slider' type='range' min='0' max='180' value={this.state.C}
-              onChange={(e) => this.setState({ 'C': parseFloat(e.target.value) })} />
-            <span className='Spacer'> </span>
-           C (chroma)
-          </div>
-          <div className='row'>
-            <input className='Slider' type='range' min='0' max='100' value={100 * this.state.offset}
-              onChange={(e) => this.setState({ 'offset': parseFloat(e.target.value) / 100 })} />
-            <span className='Spacer'> </span>
-            h-offset (hue)
-          </div>
+          {inputBool('drawLCh', 'draw as LCh (Lab otherwise)')}
+          {inputBool('colorStroke', 'color circle border (instead of interior)')}
+          {inputNumber('base_n', 'number of base colors')}
+          {inputNumber('n', 'number of colors')}
+          {inputSlider('L', 0, 100, 'L (lightness)')}
+          {inputSlider('C', 0, 180, 'C (chroma)')}
+          {inputSlider('offset', 0, 100, 'h-offset (hue)', 100)}
           {hexOutput}
         </div>
         <div>
