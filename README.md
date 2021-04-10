@@ -1,46 +1,40 @@
-# Getting Started with Create React App
+# LCh/Lab Color Palette
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Choose your colors using the [LCh/Lab color
+space](https://en.wikipedia.org/wiki/CIELAB_color_space#Cylindrical_model).
+You can [try it here](https://thobl.github.io/LCh-Lab-color-palette).
 
-## Available Scripts
+![screenshot](screenshot.jpg)
 
-In the project directory, you can run:
+## Why the LCh/Lab Color Space?
 
-### `yarn start`
+These color spaces were designed to approximate human vision.  Want to
+have different colors that are equally bright?  Fix the lightness and
+only vary the hue and/or the chromaticity (saturation).  Want to scale
+the same color from dark to light in equal steps?  Fix the hue and
+chromaticity and change the lightness in equal steps.  Want to
+interpolate between a color and the gray of equal brightness?  Fix the
+lightness and the hue and adjust the chromaticity in equal steps.  You
+get the idea.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+By the way: The LCh color space is the Lab color space but with polar
+coordinates.  I find the LCh color space more useful to think in but
+the Lab color nicer to look at.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## What are the Colored Numbers?
 
-### `yarn test`
+The colored numbers with colored background show the [CIEDE2000 color
+difference](https://en.wikipedia.org/wiki/Color_difference#CIEDE2000)
+between the two colors.  It is supposed to difference between two
+colors as perceived by humans.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Why is the UI so Crappy?
 
-### `yarn build`
+Because this was never really meant to be used by anybody but me and
+it is good enough for me.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## How can I run it Locally to Change Stuff?
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Download the repo.  In the repo folder, run `yarn` to download all the
+required packages (this has to be done only once).  Afterwards, you
+can start the app by running `yarn start`.
