@@ -25,8 +25,8 @@ the Lab color nicer to look at.
 
 The colored numbers with colored background show the [CIEDE2000 color
 difference](https://en.wikipedia.org/wiki/Color_difference#CIEDE2000)
-between the two colors.  It is supposed to difference between two
-colors as perceived by humans.
+between the two colors.  It is supposed to be the difference between
+two colors as perceived by humans.
 
 ## Why is the UI so Crappy?
 
