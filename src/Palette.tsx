@@ -77,7 +77,12 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
   componentDidUpdate(_prevProps: PaletteProps, prevState: PaletteState) {
     if (prevState.n !== this.state.n
       || prevState.base_n !== this.state.base_n
-      || prevState.offset !== this.state.offset) {
+      || prevState.offset !== this.state.offset
+      || prevState.base_L1 !== this.state.base_L1
+      || prevState.base_L2 !== this.state.base_L2
+      || prevState.base_C1 !== this.state.base_C1
+      || prevState.base_C2 !== this.state.base_C2
+      || prevState.base_h !== this.state.base_h) {
       this.initializeColors();
     }
     if (prevState.L !== this.state.L) {
@@ -98,11 +103,15 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
 
   private initializeColors() {
     let colors: Array<ColorLCh> = [];
-    const base_n = this.state.base_n;
-    const minL = 20;
-    for (let i = base_n; i > 0; i--) {
+
+    const {base_n, base_L1, base_L2, base_C1, base_C2, base_h} = this.state;
+    const step_L = (base_L2 - base_L1) / (base_n - 1);
+    const step_C = (base_C2 - base_C1) / (base_n - 1);
+    for (let i = 0; i < base_n; i++) {
       colors.push({
-        h: -90, L: minL + (i - 1) * (100 - minL) / (base_n - 1), C: 7
+        h: base_h, 
+        L: base_L1 + i * step_L,
+        C: base_C1 + i * step_C
       })
     }
     const n: number = this.state.n;
@@ -181,6 +190,11 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
           {inputBool('drawLCh', 'draw as LCh (Lab otherwise)')}
           {inputBool('colorStroke', 'color circle border (instead of interior)')}
           {inputNumber('base_n', 'number of base colors')}
+          {inputSlider('base_L1', 0, 100, 'L1 (lightness)')}
+          {inputSlider('base_C1', 0, 180, 'C1 (chroma)')}
+          {inputSlider('base_L2', 0, 100, 'L2 (lightness)')}
+          {inputSlider('base_C2', 0, 180, 'C2 (chroma)')}
+          {inputSlider('base_h', -180, 180, 'h (hue)')}
           {inputNumber('n', 'number of colors')}
           {inputSlider('L', 0, 100, 'L (lightness)')}
           {inputSlider('C', 0, 180, 'C (chroma)')}
