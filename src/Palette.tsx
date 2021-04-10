@@ -85,7 +85,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     for (let i = this.state.n_base; i < colors.length; i++) {
       colors[i][prop] = value;
     }
-    this.setState({ ['colors']: colors });
+    this.setState({ 'colors': colors });
   }
 
   private initializeColors() {
@@ -105,7 +105,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
         C: this.state.C
       });
     }
-    this.setState({ ['colors']: colors });
+    this.setState({ 'colors': colors });
   }
 
   render(): JSX.Element {
@@ -123,9 +123,9 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
       };
       return (<ColorInput key={`input_${id}`} colors={this.state.colors} id={id++} handler={handler} />);
     });
-
+    id = 0;
     const hexOutput = this.state.colors.map((color: ColorLCh): JSX.Element => {
-      return (<div>{LCh_to_Hex(color)}</div>);
+      return (<div key={`hexoutput_${id++}`}>{LCh_to_Hex(color)}</div>);
     });
 
     return (
@@ -136,41 +136,41 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
           </div>
           <div className='row'>
             <input type='checkbox' checked={this.state.drawLCh}
-              onChange={(e) => this.setState({ ['drawLCh']: e.target.checked })} />
+              onChange={(e) => this.setState({ 'drawLCh': e.target.checked })} />
             <span className='Spacer'> </span> draw as LCh (Lab otherwise)
           </div>
           <div className='row'>
             <input type='checkbox' checked={this.state.colorStroke}
-              onChange={(e) => this.setState({ ['colorStroke']: e.target.checked })} />
+              onChange={(e) => this.setState({ 'colorStroke': e.target.checked })} />
             <span className='Spacer'> </span> color circle border (instead of interior)
           </div>
           <div className='row'>
             <input className='nInput' type='text' value={this.state.n_base}
-              onChange={(e) => this.setState({ ['n_base']: parseInt(e.target.value) })} />
+              onChange={(e) => this.setState({ 'n_base': parseInt(e.target.value) })} />
             <span className='Spacer'> </span>
             number of base colors
           </div>
           <div className='row'>
             <input className='nInput' type='text' value={this.state.n}
-              onChange={(e) => this.setState({ ['n']: parseInt(e.target.value) })} />
+              onChange={(e) => this.setState({ 'n': parseInt(e.target.value) })} />
             <span className='Spacer'> </span>
             number of colors
           </div>
           <div className='row'>
             <input className='Slider' type='range' min='0' max='100' value={this.state.L}
-              onChange={(e) => this.setState({ ['L']: parseFloat(e.target.value) })} />
+              onChange={(e) => this.setState({ 'L': parseFloat(e.target.value) })} />
             <span className='Spacer'> </span>
             L (lightness)
           </div>
           <div className='row'>
             <input className='Slider' type='range' min='0' max='180' value={this.state.C}
-              onChange={(e) => this.setState({ ['C']: parseFloat(e.target.value) })} />
+              onChange={(e) => this.setState({ 'C': parseFloat(e.target.value) })} />
             <span className='Spacer'> </span>
            C (chroma)
           </div>
           <div className='row'>
             <input className='Slider' type='range' min='0' max='100' value={100 * this.state.offset}
-              onChange={(e) => this.setState({ ['offset']: parseFloat(e.target.value) / 100 })} />
+              onChange={(e) => this.setState({ 'offset': parseFloat(e.target.value) / 100 })} />
             <span className='Spacer'> </span>
             h-offset (hue)
           </div>
@@ -183,13 +183,6 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     );
   }
 
-}
-
-// min and max are inclusive
-function randomInt(min: number, max: number): number {
-  min = Math.ceil(min);
-  max = Math.floor(max) + 1;
-  return Math.floor(Math.random() * (max - min) + min);
 }
 
 export default Palette;
