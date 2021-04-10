@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/LCh-Lab-color-palette/static/css/main.f2ca4d27.chunk.css",
+    "main.js": "/LCh-Lab-color-palette/static/js/main.73f446b1.chunk.js",
+    "main.js.map": "/LCh-Lab-color-palette/static/js/main.73f446b1.chunk.js.map",
+    "runtime-main.js": "/LCh-Lab-color-palette/static/js/runtime-main.30bfdf3b.js",
+    "runtime-main.js.map": "/LCh-Lab-color-palette/static/js/runtime-main.30bfdf3b.js.map",
+    "static/js/2.5cad3dda.chunk.js": "/LCh-Lab-color-palette/static/js/2.5cad3dda.chunk.js",
+    "static/js/2.5cad3dda.chunk.js.map": "/LCh-Lab-color-palette/static/js/2.5cad3dda.chunk.js.map",
+    "index.html": "/LCh-Lab-color-palette/index.html",
+    "static/css/main.f2ca4d27.chunk.css.map": "/LCh-Lab-color-palette/static/css/main.f2ca4d27.chunk.css.map",
+    "static/js/2.5cad3dda.chunk.js.LICENSE.txt": "/LCh-Lab-color-palette/static/js/2.5cad3dda.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.30bfdf3b.js",
+    "static/js/2.5cad3dda.chunk.js",
+    "static/css/main.f2ca4d27.chunk.css",
+    "static/js/main.73f446b1.chunk.js"
+  ]
+}
