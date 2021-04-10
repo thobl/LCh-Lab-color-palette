@@ -66,7 +66,7 @@ class Palette extends React.Component<PaletteProps, PaletteState> {
     this.initializeColors();
   }
 
-  componentDidUpdate(prevProps: PaletteProps, prevState: PaletteState) {
+  componentDidUpdate(_prevProps: PaletteProps, prevState: PaletteState) {
     if (prevState.n !== this.state.n
       || prevState.n_base !== this.state.n_base
       || prevState.offset !== this.state.offset) {
